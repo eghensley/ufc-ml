@@ -14,9 +14,61 @@ from .config import CONFIG
 
 import requests 
 
+def clearElo():
+    r = requests.get(url = CONFIG['spring']['rest']['CLEAR_ELO'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT']))
+    response = r.json()
+    return response
+
+def updateElo(payload):
+    while True:
+        try:
+            r = requests.post(url = CONFIG['spring']['rest']['UPDATE_ELO'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT']), json = payload)
+            response = r.json()
+            return response
+        except requests.exceptions.RequestException as err:
+            print ("OOps: Something Else",err)
+            pass
+        except requests.exceptions.HTTPError as errh:
+            print ("Http Error:",errh)
+            pass
+        except requests.exceptions.ConnectionError as errc:
+            print ("Error Connecting:",errc)
+            pass
+        except requests.exceptions.Timeout as errt:
+            print ("Timeout Error:",errt)  
+            pass
+    
+def getLastElo(fighterOid, fightOid, debug = False):
+    while True:
+        try:
+            r = requests.get(url = CONFIG['spring']['rest']['GET_LAST_ELO'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], fighterOid, fightOid))
+            response = r.json() 
+            if response['errorMsg'] is not None and debug:
+                print(response['errorMsg'])
+            return response['response']
+        except requests.exceptions.RequestException as err:
+            print ("OOps: Something Else",err)
+            pass
+        except requests.exceptions.HTTPError as errh:
+            print ("Http Error:",errh)
+            pass
+        except requests.exceptions.ConnectionError as errc:
+            print ("Error Connecting:",errc)
+            pass
+        except requests.exceptions.Timeout as errt:
+            print ("Timeout Error:",errt)  
+            pass
+        
+def saveMlScore(payload):
+    r = requests.post(url = CONFIG['spring']['rest']['ADD_ML_SCORE'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT']), json = payload)
+    response = r.json()
+    return response
+
 def getBoutData(boutOid):
     r = requests.get(url = CONFIG['spring']['rest']['GET_BOUT_DATA_BY_OID'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], boutOid))
     response = r.json()
+    if response['errorMsg'] is not None:
+        print(response['errorMsg'])
     return response['response']
 
 def addRoundScore(oid, round_dict, fighter_name):
@@ -27,6 +79,11 @@ def addRoundScore(oid, round_dict, fighter_name):
                     
 def getTrainingFights(year):
     r = requests.get(url = CONFIG['spring']['rest']['GET_FIGHTS_BY_YEAR'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], year))
+    response = r.json()         
+    return response['response']
+
+def getAllBouts():
+    r = requests.get(url = CONFIG['spring']['rest']['GET_ALL_BOUTS'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT']))
     response = r.json()         
     return response['response']
 
@@ -69,9 +126,23 @@ def scrapeBoutScores(bout_id):
     print("Add round scores to Bout %s completed wtih %s with %s rounds found and %s completed" % (bout_id, response['status'], response['itemsFound'], response['itemsCompleted']))
 
 def refreshBout(bout_id):
-    r = requests.get(url = CONFIG['spring']['rest']['GET_BOUT'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], bout_id))
-    response = r.json() 
-    return response['response']
+    while True:
+        try:
+            r = requests.get(url = CONFIG['spring']['rest']['GET_BOUT'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], bout_id))
+            response = r.json() 
+            return response['response']
+        except requests.exceptions.RequestException as err:
+            print ("OOps: Something Else",err)
+            pass
+        except requests.exceptions.HTTPError as errh:
+            print ("Http Error:",errh)
+            pass
+        except requests.exceptions.ConnectionError as errc:
+            print ("Error Connecting:",errc)
+            pass
+        except requests.exceptions.Timeout as errt:
+            print ("Timeout Error:",errt)  
+            pass
 
 def addFightExpectedOutcomes(fight_id):
     r = requests.get(url = CONFIG['spring']['rest']['ADD_FIGHT_EXP_OUTCOME'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], fight_id))

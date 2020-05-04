@@ -1,0 +1,279 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Apr  5 15:23:51 2020
+
+@author: ehens86
+"""
+#def warn(*args, **kwargs):
+#    pass
+#import warnings
+#warnings.warn = warn
+import time
+import warnings
+from mpl_toolkits.mplot3d import Axes3D
+import numpy as np
+import matplotlib.pyplot as plt
+#import seaborn as sns; sns.set(style="ticks", color_codes=True)
+from sklearn import cluster, datasets, mixture
+from sklearn.neighbors import kneighbors_graph
+from sklearn.preprocessing import StandardScaler, RobustScaler, MinMaxScaler
+from itertools import cycle, islice
+import pandas as pd
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.model_selection import StratifiedKFold
+from sklearn.feature_selection import RFECV
+from sklearn.linear_model import LogisticRegressionCV, LogisticRegression
+
+random_state = 170
+
+import sys, os
+if __name__ == "__main__":
+    sys.path.append("..")
+    
+from data.generate import pull_year_raw_training_data
+
+
+data = pd.DataFrame()
+for year in range(2005, 2020):
+    year_data = pull_year_raw_training_data(year, score = 'finish', add_gender = True, add_class = True)
+    data = data.append(year_data)
+    
+list(data)
+data = data[['offBodySigStrikeAccuracy', 'offBodySigStrikeAttempted',
+ 'offBodySigStrikeSuccessful', 'offClinchSigStrikeAccuracy',
+ 'offClinchSigStrikeAttempted', 'offClinchSigStrikeSuccessful',
+ 'offDistanceSigStrikeAccuracy', 'offDistanceSigStrikeAttempted',
+ 'offDistanceSigStrikeSuccessful', 'offGroundSigStrikeAccuracy',
+ 'offGroundSigStrikeAttempted', 'offGroundSigStrikeSuccessful',
+ 'offHeadSigStrikeAccuracy', 'offHeadSigStrikeAttempted',
+ 'offHeadSigStrikeSuccessful', 'offKnockdowns',
+ 'offLegSigStrikeAccuracy', 'offLegSigStrikeAttempted',
+ 'offLegSigStrikeSuccessful', 'offPassSuccessful',
+ 'offReversalSuccessful', 'offTakedownAccuracy',
+ 'offTakedownAttempted', 'offTakedownSuccessful',
+ 'offTotStrikeAccuracy', 'offTotStrikeAttempted',
+ 'offTotStrikeSuccessful', 'weight', 'gender',
+ 'offBodySigStrikeAttemptedShare', 'offClinchSigStrikeSuccessfulShare',
+ 'offClinchSigStrikeAttemptedShare', 'offDistanceSigStrikeSuccessfulShare',
+ 'offDistanceSigStrikeAttemptedShare', 'offGroundSigStrikeSuccessfulShare',
+ 'offGroundSigStrikeAttemptedShare', 'offHeadSigStrikeSuccessfulShare',
+ 'offHeadSigStrikeAttemptedShare', 'offLegSigStrikeSuccessfulShare',
+ 'offLegSigStrikeAttemptedShare', 'offTotStrikeSuccessfulShare',
+ 'offTotStrikeAttemptedShare', 'offTakedownSuccessfulShare',
+ 'offTakedownAttemptedShare', 'offKnockdownsShare',
+ 'offPassSuccessfulShare', 'offReversalSuccessfulShare',
+ 'offSubmissionAttempted',  'offSubmissionAttemptedShare', 
+ 'round', 'offSubmissionSuccessful'
+ ]]
+data.to_csv("sub_2005-2019.csv")
+
+columns = ['offGroundSigStrikeAccuracy', 'offGroundSigStrikeAttempted',
+ 'offGroundSigStrikeSuccessful', 'offKnockdowns',
+ 'offPassSuccessful', 'offReversalSuccessful',
+ 'offReversalSuccessful', 'offTakedownAccuracy',
+ 'offTakedownAttempted', 'offTakedownSuccessful',
+ 'offTotStrikeAccuracy', 'offTotStrikeAttempted', 'offTotStrikeSuccessful', 'weight',
+ 'offGroundSigStrikeSuccessfulShare', 'offGroundSigStrikeAttemptedShare',
+ 'offTotStrikeSuccessfulShare', 'offTotStrikeAttemptedShare',
+ 'offTakedownSuccessfulShare', 'offTakedownAttemptedShare',
+ 'offKnockdownsShare', 'offPassSuccessfulShare',
+ 'offReversalSuccessfulShare','offSubmissionAttemptedShare', 
+ 'offSubmissionAttempted',  'offSubmissionSuccessful'
+ ]
+
+data = data[data['gender'] == 'M']
+data = data[(data['round'] == 2) | (data['round'] ==3)]
+data = data[columns]
+
+#data.to_csv("finish_2005-2019.csv")
+
+X = data[[i for i in columns if i != 'offSubmissionSuccessful']]
+y = data['offSubmissionSuccessful']
+
+#
+#model = LogisticRegressionCV(cv=5, random_state=0, class_weight=None, solver = 'liblinear', scoring = 'neg_log_loss')
+#model.fit(X, y)
+#model.get_params()
+#param_scores = model.scores_[1]
+#param_scores.mean(axis = 0)
+#param_values = model.Cs_
+#
+#tuned_model = LogisticRegression(class_weight=None, solver = 'newton-cg', C = 1.00000000e+04)
+#
+#
+#
+#tuned_model = LogisticRegressionCV(cv=5, random_state=0, class_weight='balanced', solver = 'newton-cg')
+#rfecv_tuned_log_loss = RFECV(estimator=tuned_model, step=1, cv=StratifiedKFold(6),
+#                      scoring='neg_log_loss')
+#rfecv_tuned_log_loss.fit(X, y)    
+#print("Optimal number of features : %d (%.4f)" % (rfecv_tuned_log_loss.n_features_, rfecv_tuned_log_loss.grid_scores_[rfecv_tuned_log_loss.n_features_-1])) 
+#print('Best features :', X.columns[rfecv_tuned_log_loss.support_])   
+#plt.figure()
+#plt.xlabel("Number of features selected")
+#plt.ylabel("Cross validation score (nb of correct classifications)")
+#plt.plot(range(1, len(rfecv_tuned_log_loss.grid_scores_) + 1), rfecv_tuned_log_loss.grid_scores_)
+#plt.show()
+#
+#rfecv_tuned_f1 = RFECV(estimator=tuned_model, step=1, cv=StratifiedKFold(6),
+#                      scoring='f1')
+#rfecv_tuned_f1.fit(X, y)       
+#print("Optimal number of features : %d (%.4f)" % (rfecv_tuned_f1.n_features_, rfecv_tuned_f1.grid_scores_[rfecv_tuned_f1.n_features_-1])) 
+#print('Best features :', X.columns[rfecv_tuned_f1.support_])   
+#plt.figure()
+#plt.xlabel("Number of features selected")
+#plt.ylabel("Cross validation score (nb of correct classifications)")
+#plt.plot(range(1, len(rfecv_tuned_f1.grid_scores_) + 1), rfecv_tuned_f1.grid_scores_)
+#plt.show()
+#
+#rfecv_tuned_roc = RFECV(estimator=tuned_model, step=1, cv=StratifiedKFold(6),
+#                      scoring='roc_auc')
+#rfecv_tuned_roc.fit(X, y)      
+#print("Optimal number of features : %d (%.4f)" % (rfecv_tuned_roc.n_features_, rfecv_tuned_roc.grid_scores_[rfecv_tuned_roc.n_features_-1]))  
+#print('Best features :', X.columns[rfecv_tuned_roc.support_])   
+#plt.figure()
+#plt.xlabel("Number of features selected")
+#plt.ylabel("Cross validation score (nb of correct classifications)")
+#plt.plot(range(1, len(rfecv_tuned_roc.grid_scores_) + 1), rfecv_tuned_roc.grid_scores_)
+#plt.show()
+
+
+solvers = ['newton-cg', 'lbfgs', 'liblinear']#, 'sag', 'saga']
+weights = ['balanced']
+
+print("~~~~~~~~~~~ logloss ~~~~~~~~~~~")
+scores = {}
+n = 0
+for solver in solvers:
+    for weight in weights:
+        print("Solver = %s, weight = %s" % (solver, weight))
+        n += 1
+        # Create the RFE object and compute a cross-validated score.
+        reg = LogisticRegressionCV(cv=6, random_state=0, class_weight=weight, solver = solver, max_iter = 5000)
+        #reg = LogisticRegression(class_weight=None, solver = 'saga')
+        # The "accuracy" scoring is proportional to the number of correct
+        # classifications
+        rfecv_tuned_log_loss = RFECV(estimator=reg, step=1, cv=StratifiedKFold(6),
+                      scoring='neg_log_loss')
+        rfecv_tuned_log_loss.fit(X, y)
+        print("Optimal number of features : %d (%.4f)" % (rfecv_tuned_log_loss.n_features_, rfecv_tuned_log_loss.grid_scores_[rfecv_tuned_log_loss.n_features_-1]))
+        print('Best features :', X.columns[rfecv_tuned_log_loss.support_])   
+        scores[n] = {'solver': solver, 'weight': weight, 'score': rfecv_tuned_log_loss.grid_scores_[rfecv_tuned_log_loss.n_features_-1]}
+        # Plot number of features VS. cross-validation scores
+        plt.figure()
+        plt.xlabel("Number of features selected")
+        plt.ylabel("Cross validation score (nb of correct classifications)")
+        plt.plot(range(1, len(rfecv_tuned_log_loss.grid_scores_) + 1), rfecv_tuned_log_loss.grid_scores_)
+        plt.show()
+   
+#scores = {1: {'solver': 'newton-cg',
+#  'weight': 'balanced',
+#  'score': -0.13722408483762247},
+# 2: {'solver': 'newton-cg', 'weight': None, 'score': -0.04901492088052625},
+# 3: {'solver': 'lbfgs', 'weight': 'balanced', 'score': -0.13968214978144478},
+# 4: {'solver': 'lbfgs', 'weight': None, 'score': -0.04954949621316317},
+# 5: {'solver': 'liblinear',
+#  'weight': 'balanced',
+#  'score': -0.13724325599097062},
+# 6: {'solver': 'liblinear', 'weight': None, 'score': -0.04940312485563825},
+# 7: {'solver': 'sag', 'weight': 'balanced', 'score': -0.2824492108975419},
+# 8: {'solver': 'sag', 'weight': None, 'score': -0.12442978407089877},
+# 9: {'solver': 'saga', 'weight': 'balanced', 'score': -0.2615685168207281},
+# 10: {'solver': 'saga', 'weight': None, 'score': -0.1512117420121075}}     
+scores_df = pd.DataFrame.from_dict(scores).T
+
+print("~~~~~~~~~~~ rocauc ~~~~~~~~~~~")
+roc_scores = {}
+n = 0
+for solver in solvers:
+    for weight in weights:
+        print("Solver = %s, weight = %s" % (solver, weight))
+        n += 1
+        # Create the RFE object and compute a cross-validated score.
+        reg = LogisticRegressionCV(cv=6, random_state=0, class_weight=weight, solver = solver, max_iter = 5000)
+        #reg = LogisticRegression(class_weight=None, solver = 'saga')
+        # The "accuracy" scoring is proportional to the number of correct
+        # classifications
+        rfecv_tuned_roc = RFECV(estimator=reg, step=1, cv=StratifiedKFold(6),
+                      scoring='roc_auc')
+        rfecv_tuned_roc.fit(X, y)
+        print("Optimal number of features : %d (%.4f)" % (rfecv_tuned_roc.n_features_, rfecv_tuned_roc.grid_scores_[rfecv_tuned_roc.n_features_-1]))
+        print('Best features :', X.columns[rfecv_tuned_roc.support_])   
+        roc_scores[n] = {'solver': solver, 'weight': weight, 'score': rfecv_tuned_roc.grid_scores_[rfecv_tuned_roc.n_features_-1]}
+        # Plot number of features VS. cross-validation scores
+        plt.figure()
+        plt.xlabel("Number of features selected")
+        plt.ylabel("Cross validation score (nb of correct classifications)")
+        plt.plot(range(1, len(rfecv_tuned_roc.grid_scores_) + 1), rfecv_tuned_roc.grid_scores_)
+        plt.show()     
+    
+#roc_scores = {1: {'solver': 'newton-cg', 'weight': 'balanced', 'score': 0.9884298829425561},
+# 2: {'solver': 'newton-cg', 'weight': None, 'score': 0.9882381899340665},
+# 3: {'solver': 'lbfgs', 'weight': 'balanced', 'score': 0.9881646996313717},
+# 4: {'solver': 'lbfgs', 'weight': None, 'score': 0.9877399998033282},
+# 5: {'solver': 'liblinear', 'weight': 'balanced', 'score': 0.9884320397697769},
+# 6: {'solver': 'liblinear', 'weight': None, 'score': 0.9879987348072218},
+# 7: {'solver': 'sag', 'weight': 'balanced', 'score': 0.9863134182521889},
+# 8: {'solver': 'sag', 'weight': None, 'score': 0.9646135485387447},
+# 9: {'solver': 'saga', 'weight': 'balanced', 'score': 0.9774772467441504},
+# 10: {'solver': 'saga', 'weight': None, 'score': 0.9623003513443456}}
+roc_scores_df = pd.DataFrame.from_dict(roc_scores).T
+
+print("~~~~~~~~~~~ f1 ~~~~~~~~~~~")
+f1_scores = {}
+n = 0
+for solver in solvers:
+    for weight in weights:
+        print("Solver = %s, weight = %s" % (solver, weight))
+        n += 1
+        # Create the RFE object and compute a cross-validated score.
+        reg = LogisticRegressionCV(cv=6, random_state=0, class_weight=weight, solver = solver, max_iter = 5000)
+        #reg = LogisticRegression(class_weight=None, solver = 'saga')
+        # The "accuracy" scoring is proportional to the number of correct
+        # classifications
+        rfecv_tuned_f1 = RFECV(estimator=reg, step=1, cv=StratifiedKFold(6),
+                      scoring='f1')
+        rfecv_tuned_f1.fit(X, y)
+        print("Optimal number of features : %d (%.4f)" % (rfecv_tuned_f1.n_features_, rfecv_tuned_f1.grid_scores_[rfecv_tuned_f1.n_features_-1]))
+        print('Best features :', X.columns[rfecv_tuned_f1.support_])   
+        f1_scores[n] = {'solver': solver, 'weight': weight, 'score': rfecv_tuned_f1.grid_scores_[rfecv_tuned_f1.n_features_-1]}
+        # Plot number of features VS. cross-validation scores
+        plt.figure()
+        plt.xlabel("Number of features selected")
+        plt.ylabel("Cross validation score (nb of correct classifications)")
+        plt.plot(range(1, len(rfecv_tuned_f1.grid_scores_) + 1), rfecv_tuned_f1.grid_scores_)
+        plt.show()     
+        
+#f1_scores = {1: {'solver': 'newton-cg', 'weight': 'balanced', 'score': 0.7387200142068284},
+# 2: {'solver': 'newton-cg', 'weight': None, 'score': 0.6595057474824537},
+# 3: {'solver': 'lbfgs', 'weight': 'balanced', 'score': 0.7387200142068284},
+# 4: {'solver': 'lbfgs', 'weight': None, 'score': 0.6475818348188614},
+# 5: {'solver': 'liblinear', 'weight': 'balanced', 'score': 0.7387200142068284},
+# 6: {'solver': 'liblinear', 'weight': None, 'score': 0.6437586568021351},
+# 7: {'solver': 'sag', 'weight': 'balanced', 'score': 0.5378978110514696},
+# 8: {'solver': 'sag', 'weight': None, 'score': 0.13355602437880917},
+# 9: {'solver': 'saga', 'weight': 'balanced', 'score': 0.519727176363332},
+# 10: {'solver': 'saga', 'weight': None, 'score': 0.0}}
+
+f1_scores_df = pd.DataFrame.from_dict(f1_scores).T
+
+
+model = LogisticRegressionCV(cv=10, random_state=0, class_weight='balanced', solver = 'newton-cg', scoring = 'neg_log_loss', max_iter = 5000)
+model.fit(X[['offGroundSigStrikeAccuracy', 'offGroundSigStrikeAttempted',
+       'offGroundSigStrikeSuccessful', 'offKnockdowns', 'offPassSuccessful',
+       'offReversalSuccessful', 'offReversalSuccessful',
+       'offReversalSuccessful', 'offReversalSuccessful', 'offTakedownAccuracy',
+       'offTakedownAttempted', 'offTakedownSuccessful', 'offTotStrikeAccuracy',
+       'offTotStrikeAttempted', 'offTotStrikeSuccessful', 'weight',
+       'offGroundSigStrikeSuccessfulShare', 'offGroundSigStrikeAttemptedShare',
+       'offTotStrikeSuccessfulShare', 'offTotStrikeAttemptedShare',
+       'offTakedownSuccessfulShare', 'offTakedownAttemptedShare',
+       'offKnockdownsShare', 'offPassSuccessfulShare',
+       'offReversalSuccessfulShare', 'offSubmissionAttemptedShare',
+       'offSubmissionAttempted']], y)
+model.get_params()
+param_scores = model.scores_[1]
+param_scores.mean(axis = 0)
+param_values = model.Cs_

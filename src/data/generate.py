@@ -15,39 +15,6 @@ import numpy as np
 import pandas as pd
 from spring.api_wrappers import getTrainingFights, getBoutData, getBoutsFromFight
 
-init_columns = ['boutOid','defBodySigStrikeAccuracy', 'defBodySigStrikeAttempted','defBodySigStrikeSuccessful',
- 'defClinchSigStrikeAccuracy', 'defClinchSigStrikeAttempted', 'defClinchSigStrikeSuccessful', 'defDistanceSigStrikeAccuracy',
- 'defDistanceSigStrikeAttempted', 'defDistanceSigStrikeSuccessful', 'defFinish', 'defGroundSigStrikeAccuracy',
- 'defGroundSigStrikeAttempted', 'defGroundSigStrikeSuccessful', 'defHeadSigStrikeAccuracy', 'defHeadSigStrikeAttempted',
- 'defHeadSigStrikeSuccessful', 'defKnockdowns', 'defLegSigStrikeAccuracy', 'defLegSigStrikeAttempted',
- 'defLegSigStrikeSuccessful', 'defPassSuccessful', 'defReversalSuccessful', 'defSubmissionAccuracy',
- 'defSubmissionAttempted', 'defSubmissionSuccessful', 'defTakedownAccuracy', 'defTakedownAttempted',
- 'defTakedownSuccessful', 'defTkoKo', 'defTotStrikeAccuracy', 'defTotStrikeAttempted',
- 'defTotStrikeSuccessful', 'fighterOid', 'finish', 'offBodySigStrikeAccuracy',
- 'offBodySigStrikeAttempted', 'offBodySigStrikeSuccessful', 'offClinchSigStrikeAccuracy', 'offClinchSigStrikeAttempted',
- 'offClinchSigStrikeSuccessful', 'offDistanceSigStrikeAccuracy', 'offDistanceSigStrikeAttempted', 'offDistanceSigStrikeSuccessful',
- 'offFinish', 'offGroundSigStrikeAccuracy', 'offGroundSigStrikeAttempted', 'offGroundSigStrikeSuccessful',
- 'offHeadSigStrikeAccuracy', 'offHeadSigStrikeAttempted', 'offHeadSigStrikeSuccessful', 'offKnockdowns',
- 'offLegSigStrikeAccuracy', 'offLegSigStrikeAttempted', 'offLegSigStrikeSuccessful', 'offPassSuccessful',
- 'offReversalSuccessful', 'offSubmissionAccuracy', 'offSubmissionAttempted', 'offSubmissionSuccessful',
- 'offTakedownAccuracy', 'offTakedownAttempted', 'offTakedownSuccessful', 'offTkoKo',
- 'offTotStrikeAccuracy', 'offTotStrikeAttempted', 'offTotStrikeSuccessful', 'round', 'score', 'seconds', 'weightClass']
-
-init_columns = ['defBodySigStrikeAccuracy', 'defBodySigStrikeAttempted','defBodySigStrikeSuccessful',
- 'defClinchSigStrikeAccuracy', 'defClinchSigStrikeAttempted', 'defClinchSigStrikeSuccessful', 'defDistanceSigStrikeAccuracy',
- 'defDistanceSigStrikeAttempted', 'defDistanceSigStrikeSuccessful', 'defGroundSigStrikeAccuracy',
- 'defGroundSigStrikeAttempted', 'defGroundSigStrikeSuccessful', 'defHeadSigStrikeAccuracy', 'defHeadSigStrikeAttempted',
- 'defHeadSigStrikeSuccessful', 'defKnockdowns', 'defLegSigStrikeAccuracy', 'defLegSigStrikeAttempted',
- 'defLegSigStrikeSuccessful', 'defPassSuccessful', 'defReversalSuccessful', 'defTakedownAccuracy', 'defTakedownAttempted',
- 'defTakedownSuccessful', 'defTotStrikeAccuracy', 'defTotStrikeAttempted', 'defTotStrikeSuccessful', 'offBodySigStrikeAccuracy',
- 'offBodySigStrikeAttempted', 'offBodySigStrikeSuccessful', 'offClinchSigStrikeAccuracy', 'offClinchSigStrikeAttempted',
- 'offClinchSigStrikeSuccessful', 'offDistanceSigStrikeAccuracy', 'offDistanceSigStrikeAttempted', 'offDistanceSigStrikeSuccessful',
- 'offGroundSigStrikeAccuracy', 'offGroundSigStrikeAttempted', 'offGroundSigStrikeSuccessful',
- 'offHeadSigStrikeAccuracy', 'offHeadSigStrikeAttempted', 'offHeadSigStrikeSuccessful', 'offKnockdowns',
- 'offLegSigStrikeAccuracy', 'offLegSigStrikeAttempted', 'offLegSigStrikeSuccessful', 'offPassSuccessful',
- 'offReversalSuccessful', 'offTakedownAccuracy', 'offTakedownAttempted', 'offTakedownSuccessful',
- 'offTotStrikeAccuracy', 'offTotStrikeAttempted', 'offTotStrikeSuccessful', 'score', 'seconds']
-
 def generate_raw_round_data():
     data_dict = {}
     for year in range(2012, 2020):
@@ -59,12 +26,30 @@ def generate_raw_round_data():
                 bout_id = bout['boutId']
                 bout_data = getBoutData(bout_id)
                 for row in bout_data:
+                    row['date'] = fight_date
                     data_dict[row['oid']] = row
                     
     data = pd.DataFrame.from_dict(data_dict).T
     data = data[[i for i in list(data) if i != 'score']]
     data.to_csv("raw_round_data.csv")
 
+def generate_year_data(year):
+    fight_id_list = getTrainingFights(year)
+    data_dict = {}
+    for fight_id in fight_id_list:
+        fight_details = getBoutsFromFight(fight_id)
+        fight_date = fight_details['fightDate']
+        for bout in fight_details['bouts']:
+            bout_id = bout['boutId']
+            bout_data = getBoutData(bout_id)
+            for row in bout_data:
+                row['date'] = fight_date
+                data_dict[row['oid']] = row
+                
+    data = pd.DataFrame.from_dict(data_dict).T
+    data.set_index('oid', inplace = True)
+    data.to_csv("output_round_data_%s.csv" % (year))
+    
 def generate_score_training_data():
     fight_id_list = getTrainingFights(2019)
     data_dict = {}
@@ -75,6 +60,7 @@ def generate_score_training_data():
             bout_id = bout['boutId']
             bout_data = getBoutData(bout_id)
             for row in bout_data:
+                row['date'] = fight_date
                 data_dict[row['oid']] = row
                 
     data = pd.DataFrame.from_dict(data_dict).T
@@ -88,16 +74,16 @@ def single_row_per_round(data):
 
 def apply_gender(weightClass):
     if (weightClass in ['WW', 'LW', 'FFW', 'MW', 'HW', 'FW', 'BW', 'CW', 'LHW']):
-        return 0
+        return "M"
     else:
-        return 1
+        return "F"
     
 def add_gender_col(data):
     data['gender']=data['weightClass'].apply(lambda x: apply_gender(x))
     return data
 
 def add_class_col(data):
-    class_dict = {'WSW': 0, 'FW':1, 'WFW': 1, 'BW': 2, 'WBW': 2, 'FFW': 3, 'WFFW': 3, 'LW': 4, 'WW': 5, 'MW': 6, 'LHW': 7, 'HW': 8, 'CW': 9}
+    class_dict = {'WSW': "SW", 'FW':"FW", 'WFW': "FW", 'BW': "BW", 'WBW': "BW", 'FFW': "FFW", 'WFFW': "FFW", 'LW': "LW", 'WW': "WW", 'MW': "MW", 'LHW': "LHW", 'HW': "HW", 'CW': "CW"}
     data['class'] = data['weightClass'].apply(lambda x: class_dict[x])
     return data
 
@@ -107,12 +93,26 @@ def conv_stats_to_rate(data):
         data['def'+strike_col+'Successful'] = data['def'+strike_col+'Successful'] / data['seconds']
         data['off'+strike_col+'Attempted'] = data['off'+strike_col+'Attempted'] / data['seconds']
         data['def'+strike_col+'Attempted'] = data['def'+strike_col+'Attempted'] / data['seconds']        
-    for tech_col in ['Knockdowns', 'PassSuccessful', 'ReversalSuccessful']:
+    for tech_col in ['Knockdowns', 'PassSuccessful', 'ReversalSuccessful', 'SubmissionAttempted']:
         data['off'+tech_col] = data['off'+tech_col] / data['seconds']
         data['def'+tech_col] = data['def'+tech_col] / data['seconds']             
     return data
     
-def pull_score_training_data(norm_to_rate = True, binary = True, drop_finishes = True, single_row = False, add_gender = False, add_class = False):
+def add_share_cols(data):
+    for strike_col in ['BodySigStrike', 'ClinchSigStrike', 'DistanceSigStrike', 'GroundSigStrike', 'HeadSigStrike', 'LegSigStrike', 'TotStrike', 'Takedown']:
+        data['off'+strike_col+'SuccessfulShare'] = data['off'+strike_col+'Successful'] / (data['off'+strike_col+'Successful'] + data['def'+strike_col+'Successful'])
+        data['off'+strike_col+'AttemptedShare'] = data['off'+strike_col+'Attempted'] / (data['off'+strike_col+'Attempted'] + data['def'+strike_col+'Attempted'])
+        data['off'+strike_col+'SuccessfulShare'].replace([np.inf, -np.inf], 0, inplace = True)
+        data['off'+strike_col+'AttemptedShare'].replace([np.inf, -np.inf], 0, inplace = True)
+        data['off'+strike_col+'SuccessfulShare'].fillna(0, inplace = True)
+        data['off'+strike_col+'AttemptedShare'].fillna(0, inplace = True)
+    for tech_col in ['Knockdowns', 'PassSuccessful', 'ReversalSuccessful', 'SubmissionAttempted']:
+        data['off'+tech_col+'Share'] = data['off'+tech_col] / (data['off'+tech_col] + data['def'+tech_col])
+        data['off'+tech_col+'Share'].replace([np.inf, -np.inf], 0, inplace = True)
+        data['off'+tech_col+'Share'].fillna(0, inplace = True)
+    return data
+    
+def pull_score_training_data(norm_to_rate = True, add_share_feats = True, binary = True, drop_finishes = True, single_row = False, add_gender = False, add_class = False):
     if not os.path.exists("output_round_score_data.csv"):
         generate_score_training_data()
     data = pd.read_csv("../data/output_round_score_data.csv")
@@ -120,7 +120,7 @@ def pull_score_training_data(norm_to_rate = True, binary = True, drop_finishes =
     if (drop_finishes):
         data = data[data['finish'] != 1]
     if (binary):
-        data['score'] = data['score'].apply(lambda x: 1 if x > 0 else 0)
+        data['score'] = data['score'].apply(lambda x: 1 if x > 0 else -1)
     if (single_row):
         data = single_row_per_round(data)
     if (add_gender):
@@ -129,147 +129,51 @@ def pull_score_training_data(norm_to_rate = True, binary = True, drop_finishes =
         data = add_class_col(data)
     if (norm_to_rate):
         data = conv_stats_to_rate(data)
+    if (add_share_feats):
+        data = add_share_cols(data)
+    data.to_csv("watson_score_classification_output.csv")
+        
+def pull_year_raw_training_data(year, norm_to_rate = True, add_share_feats = True, score = 'ko', drop_finishes = False, single_row = False, add_gender = False, add_class = False):
+    if not os.path.exists("../data/output_round_data_%s.csv" % (year)):
+        generate_year_data(year)
+    data = pd.read_csv("../data/output_round_data_%s.csv" % (year))
+    data.set_index("oid", inplace = True)
+    if (drop_finishes):
+        data = data[data['finish'] != 1]
+    if (single_row):
+        data = single_row_per_round(data)
+    if (add_gender):
+        data = add_gender_col(data)
+    if (add_class):
+        data = add_class_col(data)
+    if (norm_to_rate):
+        data = conv_stats_to_rate(data)
+    if (add_share_feats):
+        data = add_share_cols(data)
+    return data
 
-
-
-
-    list(data)
-#    data.rename(columns = {'defBodySigStrikeAttemped':'defBodySigStrikeAttempted',
-#                       'offBodySigStrikeAttemped':'offBodySigStrikeAttempted',
-#                       'defClinchSigStrikeAttemped':'defClinchSigStrikeAttempted',
-#                       'offClinchSigStrikeAttemped':'offClinchSigStrikeAttempted',
-#                       'offDistanceSigStrikeAttemped':'offDistanceSigStrikeAttempted',
-#                       'defDistanceSigStrikeAttemped':'defDistanceSigStrikeAttempted',
-#                       'offGroundSigStrikeAttemped':'offGroundSigStrikeAttempted',
-#                       'defGroundSigStrikeAttemped':'defGroundSigStrikeAttempted',
-#                       'offHeadSigStrikeAttemped':'offHeadSigStrikeAttempted',
-#                       'defHeadSigStrikeAttemped':'defHeadSigStrikeAttempted',
-#                       'offLegSigStrikeAttemped':'offLegSigStrikeAttempted',
-#                       'defLegSigStrikeAttemped':'defLegSigStrikeAttempted'                       
-#                       }, inplace = True) 
-#    export_data_cont = data[[
-#     'defBodySigStrikeAccuracy',
-#     'defBodySigStrikeAttempted',
-#     'defBodySigStrikeSuccessful',
-#     'defClinchSigStrikeAccuracy',
-#     'defClinchSigStrikeAttempted',
-#     'defClinchSigStrikeSuccessful',
-#     'defDistanceSigStrikeAccuracy',
-#     'defDistanceSigStrikeAttempted',
-#     'defDistanceSigStrikeSuccessful',
-#     'defGroundSigStrikeAccuracy',
-#     'defGroundSigStrikeAttempted',
-#     'defGroundSigStrikeSuccessful',
-#     'defHeadSigStrikeAccuracy',
-#     'defHeadSigStrikeAttempted',
-#     'defHeadSigStrikeSuccessful',
-#     'defKnockdowns',
-#     'defLegSigStrikeAccuracy',
-#     'defLegSigStrikeAttempted',
-#     'defLegSigStrikeSuccessful',
-#     'defPassSuccessful',
-#     'defReversalSuccessful',
-#     'defSubmissionAttempted',
-#     'defTakedownAttempted',
-#     'defTakedownSuccessful',
-#     'defTotStrikeAccuracy',
-#     'defTotStrikeAttempted',
-#     'defTotStrikeSuccessful',
-#     'offBodySigStrikeAccuracy',
-#     'offBodySigStrikeAttempted',
-#     'offBodySigStrikeSuccessful',
-#     'offClinchSigStrikeAccuracy',
-#     'offClinchSigStrikeAttempted',
-#     'offClinchSigStrikeSuccessful',
-#     'offDistanceSigStrikeAccuracy',
-#     'offDistanceSigStrikeAttempted',
-#     'offDistanceSigStrikeSuccessful',
-#     'offGroundSigStrikeAccuracy',
-#     'offGroundSigStrikeAttempted',
-#     'offGroundSigStrikeSuccessful',
-#     'offHeadSigStrikeAccuracy',
-#     'offHeadSigStrikeAttempted',
-#     'offHeadSigStrikeSuccessful',
-#     'offKnockdowns',
-#     'offLegSigStrikeAccuracy',
-#     'offLegSigStrikeAttempted',
-#     'offLegSigStrikeSuccessful',
-#     'offPassSuccessful',
-#     'offReversalSuccessful',
-#     'offSubmissionAttempted',
-#     'offTakedownAttempted',
-#     'offTakedownSuccessful',
-#     'offTakedownAccuracy',
-#     'offTotStrikeAccuracy',
-#     'offTotStrikeAttempted',
-#     'offTotStrikeSuccessful',
-#     'score',
-#     'seconds']]
-#    
-#    export_data_cont.to_csv("output_round_score_data_cont.csv")
-#    data['binary_score'] = data['score'].apply(lambda x: 1 if x > 0 else 0)
-#    export_data_bin = data[[
-#     'defBodySigStrikeAccuracy',
-#     'defBodySigStrikeAttempted',
-#     'defBodySigStrikeSuccessful',
-#     'defClinchSigStrikeAccuracy',
-#     'defClinchSigStrikeAttempted',
-#     'defClinchSigStrikeSuccessful',
-#     'defDistanceSigStrikeAccuracy',
-#     'defDistanceSigStrikeAttempted',
-#     'defDistanceSigStrikeSuccessful',
-#     'defGroundSigStrikeAccuracy',
-#     'defGroundSigStrikeAttempted',
-#     'defGroundSigStrikeSuccessful',
-#     'defHeadSigStrikeAccuracy',
-#     'defHeadSigStrikeAttempted',
-#     'defHeadSigStrikeSuccessful',
-#     'defKnockdowns',
-#     'defLegSigStrikeAccuracy',
-#     'defLegSigStrikeAttempted',
-#     'defLegSigStrikeSuccessful',
-#     'defPassSuccessful',
-#     'defReversalSuccessful',
-#     'defSubmissionAttempted',
-#     'defTakedownAttempted',
-#     'defTakedownSuccessful',
-#     'defTotStrikeAccuracy',
-#     'defTotStrikeAttempted',
-#     'defTotStrikeSuccessful',
-#     'offBodySigStrikeAccuracy',
-#     'offBodySigStrikeAttempted',
-#     'offBodySigStrikeSuccessful',
-#     'offClinchSigStrikeAccuracy',
-#     'offClinchSigStrikeAttempted',
-#     'offClinchSigStrikeSuccessful',
-#     'offDistanceSigStrikeAccuracy',
-#     'offDistanceSigStrikeAttempted',
-#     'offDistanceSigStrikeSuccessful',
-#     'offGroundSigStrikeAccuracy',
-#     'offGroundSigStrikeAttempted',
-#     'offGroundSigStrikeSuccessful',
-#     'offHeadSigStrikeAccuracy',
-#     'offHeadSigStrikeAttempted',
-#     'offHeadSigStrikeSuccessful',
-#     'offKnockdowns',
-#     'offLegSigStrikeAccuracy',
-#     'offLegSigStrikeAttempted',
-#     'offLegSigStrikeSuccessful',
-#     'offPassSuccessful',
-#     'offReversalSuccessful',
-#     'offSubmissionAttempted',
-#     'offTakedownAttempted',
-#     'offTakedownSuccessful',
-#     'offTotStrikeAccuracy',
-#     'offTotStrikeAttempted',
-#     'offTotStrikeSuccessful',
-#     'binary_score',
-#     'seconds']]
-#    export_data_bin.to_csv("output_round_score_data_binary.csv")
-    
-
-
-
+def pull_raw_training_data(norm_to_rate = True, add_share_feats = True, score = 'binary', drop_finishes = True, single_row = False, add_gender = False, add_class = False):
+    if not os.path.exists("raw_round_data.csv"):
+        generate_raw_round_data()
+    data = pd.read_csv("../data/raw_round_data.csv")
+    data.set_index("oid", inplace = True)
+    if (drop_finishes):
+        data = data[data['finish'] != 1]
+    if (score == 'binary'):
+        data['score'] = data['score'].apply(lambda x: 1 if x > 0 else -1)
+    elif score == 'finish':
+        data['score'] = data['offFinish'] - data['defFinish']
+    if (single_row):
+        data = single_row_per_round(data)
+    if (add_gender):
+        data = add_gender_col(data)
+    if (add_class):
+        data = add_class_col(data)
+    if (norm_to_rate):
+        data = conv_stats_to_rate(data)
+    if (add_share_feats):
+        data = add_share_cols(data)
+    return data
 
 def combinedRoundStats(data):
     strike_feats = []
