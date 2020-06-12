@@ -38,6 +38,27 @@ def updateElo(payload):
             print ("Timeout Error:",errt)  
             pass
     
+def getLastEloCount(fighterOid, fightOid, debug = False):
+    while True:
+        try:
+            r = requests.get(url = CONFIG['spring']['rest']['GET_LAST_ELO_COUNT'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], fighterOid, fightOid))
+            response = r.json() 
+            if response['errorMsg'] is not None and debug:
+                print(response['errorMsg'])
+            return response['response']
+        except requests.exceptions.RequestException as err:
+            print ("OOps: Something Else",err)
+            pass
+        except requests.exceptions.HTTPError as errh:
+            print ("Http Error:",errh)
+            pass
+        except requests.exceptions.ConnectionError as errc:
+            print ("Error Connecting:",errc)
+            pass
+        except requests.exceptions.Timeout as errt:
+            print ("Timeout Error:",errt)  
+            pass
+        
 def getLastElo(fighterOid, fightOid, debug = False):
     while True:
         try:
@@ -64,6 +85,11 @@ def saveMlScore(payload):
     response = r.json()
     return response
 
+def saveBoutMlScore(payload):
+    r = requests.post(url = CONFIG['spring']['rest']['ADD_BOUT_ML_SCORE'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT']), json = payload)
+    response = r.json()
+    return response
+
 def getBoutData(boutOid):
     r = requests.get(url = CONFIG['spring']['rest']['GET_BOUT_DATA_BY_OID'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], boutOid))
     response = r.json()
@@ -76,6 +102,16 @@ def addRoundScore(oid, round_dict, fighter_name):
     response = r.json() 
     if response['status'] != 'OK':
         print("Save for %s round %s failed with.. %s" % (fighter_name, round_dict['round'], response['errorMsg']))
+
+def addFutBoutData(payload):
+    r = requests.post(url = CONFIG['spring']['rest']['ADD_FUT_BOUT_SUMMARY'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT']), json = payload)
+    response = r.json() 
+    return response
+
+def addMyBookieOdds(payload):
+    r = requests.post(url = CONFIG['spring']['rest']['ADD_MY_BOOKIE_ODDS'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT']), json = payload)
+    response = r.json() 
+    return response
                     
 def getTrainingFights(year):
     r = requests.get(url = CONFIG['spring']['rest']['GET_FIGHTS_BY_YEAR'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], year))
@@ -87,8 +123,23 @@ def getAllBouts():
     response = r.json()         
     return response['response']
 
+def getYearBouts():
+    r = requests.get(url = CONFIG['spring']['rest']['GET_YEAR_BOUTS'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT']))
+    response = r.json()         
+    return response['response']
+
+def getNewBouts():
+    r = requests.get(url = CONFIG['spring']['rest']['GET_NEW_BOUTS'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT']))
+    response = r.json()         
+    return response['response']
+
 def addBoutsToFight(fight_id):
     r = requests.get(url = CONFIG['spring']['rest']['ADD_BOUTS_TO_FIGHT'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], fight_id))
+    response = r.json()
+    print("Add Bouts to Fight %s completed %s with %s bouts found and %s completed" % (fight_id, response['status'], response['itemsFound'], response['itemsCompleted']))
+
+def addBoutsToFutureFight(fight_id):
+    r = requests.get(url = CONFIG['spring']['rest']['ADD_BOUTS_TO_FUTURE_FIGHT'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], fight_id))
     response = r.json()
     print("Add Bouts to Fight %s completed %s with %s bouts found and %s completed" % (fight_id, response['status'], response['itemsFound'], response['itemsCompleted']))
 
@@ -100,6 +151,12 @@ def getBoutsFromFight(fight_id):
         print("Get bouts from fight %s failed" % (fight_id))
     else:
         return response['response']
+    
+def futureFightUpdate():
+    r = requests.get(url = CONFIG['spring']['rest']['INIT_FUTURE_FIGHT_URL'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT']))
+    response = r.json()
+    if (response['errorMsg'] is not None):
+        print(response['errorMsg'])
     
 def initUpdate():
     r = requests.get(url = CONFIG['spring']['rest']['INIT_FIGHT_URL'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT']))

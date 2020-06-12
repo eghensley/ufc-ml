@@ -1,2 +1,16 @@
 
 *.pyc
+
+src/training/old/
+src/predictors/old/
+src/training/elo/
+src/training/ml/
+src/training/bet/
+
+src/data/old/
+
+src/need_refactoring/
+
+src/elo/old/
+src/elo/models/
+src/elo/scores/
