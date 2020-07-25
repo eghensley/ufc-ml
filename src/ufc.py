@@ -6,11 +6,12 @@ Created on Tue May 12 18:28:04 2020
 @author: ehens86
 """
 
-from training import tune_ml, fill_ml_training_scores, optimize_bet, predict_bet_winners
+from training import tune_ml, fill_ml_training_scores, optimize_bet, predict_bet_winners, gen_score_report
 from elo import optimize_elo, populate_elo
 from db import pop_future_bouts, pop_year_bouts, update_mybookie
 
-optimize_bet(trials = 5000)
+gen_score_report()
+#optimize_bet(trials = 5000)
 
 #pop_year_bouts()
 

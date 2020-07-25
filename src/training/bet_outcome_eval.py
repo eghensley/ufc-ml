@@ -395,7 +395,9 @@ def gen_score_report():
                       diff_floor = param['diff_floor']
                               )
             res = better.evaluate(full_score = True, 
-                                  fight_list = ["14b9e0f2679a2205",
+                                  fight_list = ["1e13936d708bcff7",
+                                                "4c12aa7ca246e7a4",
+                                                "14b9e0f2679a2205",
                                                 "dfb965c9824425db",
                                                 "5f8e00c27b7e7410",
                                                 "898337ef520fe4d3",
@@ -458,10 +460,8 @@ def validate_new_fights():
     res = bettor.evaluate(full_score = True, 
                           fight_list = ["dbd198f780286aca",
                                         "c32eab6c2119e989",
-                                        "2eab7a6c8b0ed8cc",
-                                        "1e13936d708bcff7",
-                                        "4c12aa7ca246e7a4",
-                                        "14b9e0f2679a2205"],
+                                        "2eab7a6c8b0ed8cc"
+                                        ],
                             save_results = False,
                             validate = True
                             )
