@@ -56,7 +56,7 @@ def convImpPercToAmericanOdds(impPerc):
     
 def convAmericanOddsToImpPerc(amerOdds):
     if amerOdds == 100:
-        return 50
+        return .5
     elif amerOdds > 100:
         return (100/(amerOdds + 100))
     else:

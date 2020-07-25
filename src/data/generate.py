@@ -117,7 +117,7 @@ def pull_ml_training_corpus():
     data = data[data['gender'] == 'M']
     return data
 
-#fight_id, bout_id = '4834ff149dc9542a', 'eed6c9aff2234b7a'
+#fight_id, bout_id = '4834ff149dc9542a', '0e8d5c16eb9cb1cf'
 def pull_bout_data(bout_id):
     raw_data = getBoutData(bout_id)
     data_dict = {}

@@ -136,6 +136,7 @@ def getNewBouts():
 def addBoutsToFight(fight_id):
     r = requests.get(url = CONFIG['spring']['rest']['ADD_BOUTS_TO_FIGHT'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], fight_id))
     response = r.json()
+    print(response)
     print("Add Bouts to Fight %s completed %s with %s bouts found and %s completed" % (fight_id, response['status'], response['itemsFound'], response['itemsCompleted']))
 
 def addBoutsToFutureFight(fight_id):

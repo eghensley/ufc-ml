@@ -16,11 +16,21 @@ from utils.general import convAmericanOddsToImpPerc
 #delete from ufc2.fighter_bout_xref fbx2 where fbx2.oid in (select fbx.oid from ufc2.bout b join ufc2.fighter_bout_xref fbx on b.oid = fbx.bout_oid join ufc2.fighter f on f.oid = fbx.fighter_oid where b.fight_oid = 'f350febb-5ff9-4c85-875c-d39fcd853143' order by b.oid)
 #delete from ufc2.bout b2 where b2.oid in (select b.oid from ufc2.bout b where fight_oid = 'f350febb-5ff9-4c85-875c-d39fcd853143')
 
-
+#ALTER TABLE ufc2.bfo_expected_outcome DISABLE TRIGGER ALL;
+#ALTER TABLE ufc2.fighter_bout_xref DISABLE TRIGGER ALL;
+#
+#delete from ufc2.bfo_expected_outcome beo where beo.fighter_bout_oid  in (select fbx.oid from ufc2.bout b join ufc2.fighter_bout_xref fbx on b.oid = fbx.bout_oid join ufc2.fighter f on f.oid = fbx.fighter_oid where b.fight_oid = '9d682860-b23d-44d3-877b-92eb5cffe97e' order by b.oid);
+#delete from ufc2.fighter_bout_xref fbx2 where fbx2.oid in (select fbx.oid from ufc2.bout b join ufc2.fighter_bout_xref fbx on b.oid = fbx.bout_oid join ufc2.fighter f on f.oid = fbx.fighter_oid where b.fight_oid = '9d682860-b23d-44d3-877b-92eb5cffe97e' order by b.oid);
+#
+#ALTER TABLE ufc2.bfo_expected_outcome ENABLE TRIGGER ALL;
+#ALTER TABLE ufc2.fighter_bout_xref ENABLE TRIGGER ALL;
+#
+#delete from ufc2.bout b2 where b2.oid in (select b.oid from ufc2.bout b where fight_oid = '9d682860-b23d-44d3-877b-92eb5cffe97e');
+#
 
 #addInfoToAllBouts("53278852bcd91e11")
 #
-#   fight_id, bout_id = '1e13936d708bcff7', '4eff0432bd364a23'
+#   fight_id = 'ddbd0d6259ce57cc'
 def add_new_bouts(fight_id):
     addBoutsToFutureFight(fight_id)
     fight_details = getBoutsFromFight(fight_id)
@@ -57,7 +67,8 @@ def add_new_bouts(fight_id):
 def update_mybookie(fight_id):
     fight_details = getBoutsFromFight(fight_id)
     for bout in fight_details['bouts']:
-        
+#        if bout['oid'] != 'ecb7e38b-0315-4d0d-a734-53f6167ae6bb':
+#            continue
 #        bout = fight_details['bouts'][-4]
         if bout['gender'] != 'MALE':
             continue
@@ -95,4 +106,4 @@ def pop_year_bouts(year):
 def pop_future_bouts():
     futureFightUpdate()
     initUpdate()
-    pop_year_bouts(2020)
+#    pop_year_bouts(2020)

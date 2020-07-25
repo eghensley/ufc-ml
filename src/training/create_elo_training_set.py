@@ -69,6 +69,7 @@ def format_elo_data(bout_oid, use_prev = False):
         fighter_data['mlOdds'] = fbx['mlOdds']
         if use_prev:
             prev_data = getLastElo(fbx['fighter']['oid'], bout_info['fightOid'])
+            print(prev_data)
 #            print(prev_data)
             if prev_data['offStrikeEloPost'] is None:
                 continue
@@ -235,7 +236,7 @@ def format_elo_data_2(fight):
     bout_training_data['rounds'] = fight['schedRounds']
     return bout_training_data
     
-#   bout_oid = '0170db5fad04e4d0'
+#   bout_oid = 'd4c314616eac8f8b'
 def form_new_ml_odds_data(bout_oid):
     try:
         fight = format_elo_data(bout_oid, use_prev = True)

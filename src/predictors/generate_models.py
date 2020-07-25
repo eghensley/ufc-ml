@@ -104,7 +104,7 @@ def generate_new_win_score(data):
     sub_score = sub_model.predict_proba(sub_scale.transform(np.array(data[red_feats['features']]).reshape(1,-1)))[0][1]
     return sub_score
 
-#   fight_id, bout_id = '4834ff149dc9542a', '4eff0432bd364a23'
+#   fight_id, bout_id = '4834ff149dc9542a', '0e8d5c16eb9cb1cf'
 def insert_new_ml_scores(bout_id):
     round_data = pull_bout_data(bout_id)
     for idx in round_data.index:
@@ -117,7 +117,7 @@ def insert_new_ml_scores(bout_id):
         if resp['errorMsg'] is not None:
             print(resp['errorMsg'])
             
-#    bout_id = '0170db5fad04e4d0'
+#    bout_id = 'd4c314616eac8f8b'
 def insert_new_ml_prob(bout_id):
     bout_detail = refreshBout(bout_id)
     

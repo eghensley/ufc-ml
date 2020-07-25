@@ -85,17 +85,20 @@ class bet_eval:
             self._bout_data['%s_outcome' % (f)] = 1
         elif fbx['outcome'] == 'L':
             self._bout_data['%s_outcome' % (f)] = 0
-        elif fbx['outcome'] == 'D':
+        elif fbx['outcome'] == 'D' or fbx['outcome'] == 'NC':
             if self.debug:
                 print('OUTCOME - skipping bout as outcome = %s' % (fbx['outcome']))
             self._skip = True
             return
         else:
+            if self.debug:
+                print('OUTCOME - skipping bout as outcome = %s' % (fbx['outcome']))
             dafdasfa
             
     def _predict(self, f, fbx):
         if fbx['expOdds'] is None:
             self._skip = True
+            print(' missing expected odds ')
             return
         self._bout_data['%s_prev_fights' % (f)] = getLastEloCount(fbx['fighter']['oid'], self._bout_info['fightOid'])
         
@@ -427,6 +430,68 @@ def gen_score_report():
     pos_models_df = pd.DataFrame.from_dict(pos_models).T
     pos_models_df.to_csv("betting_model_params.csv")
     
+    
+def validate_new_fights():
+    with open('predictors/bet/bettor_config.json', 'r') as r:
+        param = json.load(r)    
+    bettor = bet_eval(debug = True,
+                      conf_diff_lin = param['conf_diff_lin'],
+                      conf_diff_quad = param['conf_diff_quad'],
+                      num_fight_lin = param['num_fight_lin'],
+                      num_fight_quad = param['num_fight_quad'],
+                      bet_intercept = param['bet_intercept'],
+                      prev_fight_ceiling = param['prev_fight_ceiling'],
+                      prev_fight_floor = param['prev_fight_floor'],
+                      diff_ceiling = param['diff_ceiling'],
+                      diff_floor = param['diff_floor']
+                      )      
+    res = bettor.evaluate(full_score = True, 
+                          fight_list = ["dbd198f780286aca",
+                                        "c32eab6c2119e989",
+                                        "2eab7a6c8b0ed8cc",
+                                        "1e13936d708bcff7",
+                                        "4c12aa7ca246e7a4",
+                                        "14b9e0f2679a2205"],
+                            save_results = False,
+                            validate = True
+                            )
+#    FINAL: 19 bouts bet on
+#    {'model_id': '09c03503-f97d-4828-bd91-e02178ff041c', 'average': -25.564903527386413, 'gross': -485.73316702034185}
+    res = bettor.evaluate(full_score = True, 
+                          fight_list = ["dfb965c9824425db",
+                                        "5f8e00c27b7e7410",
+                                        "898337ef520fe4d3",
+                                        "53278852bcd91e11",
+                                        "0b5b6876c2a4723f"],
+                            save_results = False,
+                            validate = True
+                            )  
+#   FINAL: 19 bouts bet on
+#   {'model_id': 'd24d5722-460b-4e2f-ba7b-292b51550e1b', 'average': 24.518646893254747, 'gross': 465.8542909718402}
+#    
+#   FINAL: 20 bouts bet on
+#   {'model_id': 'b1d20286-05bc-494c-9098-b4f22c7d838f', 'average': 12.336904823309654, 'gross': 246.73809646619307}
+
+    res = bettor.evaluate(full_score = True, 
+                          fight_list = ['fc9a9559a05f2704',
+                                        '33b2f68ef95252e0',
+                                        '5df17b3620145578',
+                                        'b26d3e3746fb4024',
+                                        '44aa652b181bcf68',
+                                        '0c1773639c795466'],
+                            save_results = False,
+                            validate = True
+                            )  
+#    FINAL: 14 bouts bet on
+#    {'model_id': '88d00cf2-331b-4c6d-971f-ed3a013d002c', 'average': 31.298301890398868, 'gross': 438.17622646558414}
+    val_score = {}
+    val_score['gross'] = res['gross']
+    val_score['average'] = res['average']
+    
+#    bettor._predictions
+    
+#    fight_id = 'dbd198f780286aca'
+    
 def add_best_model():
     best_model_id = '4e1c4251-de3d-4bc7-aafd-519ef0a0939a'
     with open('training/bet/models/%s.json'% (best_model_id)) as f:
@@ -434,7 +499,7 @@ def add_best_model():
     with open('predictors/bet/bettor_config.json', 'w') as w:
         json.dump(mod, w)
     
-#    fight_id = '1e13936d708bcff7'
+#    fight_id = 'ddbd0d6259ce57cc'
 def predict_bet_winners(fight_id):
     with open('predictors/bet/bettor_config.json', 'r') as r:
         param = json.load(r)    
@@ -452,8 +517,5 @@ def predict_bet_winners(fight_id):
     preds = bettor.predict(fight_id)
     print(preds)
     preds_df = pd.DataFrame.from_dict(preds).T
-
-
-#       0.07003670929925641 + (0.18937282426551197 * 17.781503641939558) + (0.4112778094807417 * (17.781503641939558**2)) + (0.14301892470651825 * 14) + (-0.2760596956680524 * (14**2)) + (0.14301892470651825 * 13) + (-0.2760596956680524 * (13**2))
     
     

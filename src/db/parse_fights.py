@@ -6,13 +6,13 @@ Created on Fri Dec 27 17:06:55 2019
 @author: eric.hensleyibm.com
 """
 
-import sys
-if __name__ == "__main__":
-    sys.path.append("..")
+#import sys
+#if __name__ == "__main__":
+#    sys.path.append("..")
     
 from spring import addRoundScore, getAllFightIds, getBoutsFromFight, addBoutScoreUrls, \
                          addBoutsToFight, addBoutDetails, addFightOddsUrl, refreshBout, \
-                         scrapeBoutScores, addFightOdds, addFightExpectedOutcomes
+                         scrapeBoutScores, addFightOdds, addFightExpectedOutcomes, getTrainingFights
 from predictors import insert_new_ml_scores, insert_new_ml_prob
 from elo import populate_elo
 
@@ -22,6 +22,41 @@ ADD_ODDS = True
 ADD_SCORES = False
 
 #refreshBout('0fcf42b68f2f0fa3')
+
+
+#ALTER TABLE ufc2.bfo_expected_outcome DISABLE TRIGGER ALL;
+#ALTER TABLE ufc2.fighter_bout_xref DISABLE TRIGGER ALL;
+#
+#delete from ufc2.bfo_expected_outcome beo 
+#	where beo.fighter_bout_oid 
+#		in (select fbx.oid from ufc2.bout b 
+#			join ufc2.fighter_bout_xref fbx 
+#			on b.oid = fbx.bout_oid 
+#			join ufc2.fighter f 
+#			on f.oid = fbx.fighter_oid 
+#		where b.fight_oid = 'cd200d5f-2813-4ab0-9eb2-f9a026883d79' 
+#		order by b.oid);
+#		
+#delete from ufc2.fighter_bout_xref fbx2 
+#	where fbx2.oid 
+#		in (select fbx.oid from ufc2.bout b 
+#			join ufc2.fighter_bout_xref fbx 
+#			on b.oid = fbx.bout_oid 
+#			join ufc2.fighter f 
+#			on f.oid = fbx.fighter_oid 
+#		where b.fight_oid = 'cd200d5f-2813-4ab0-9eb2-f9a026883d79' 
+#		order by b.oid);
+#
+#ALTER TABLE ufc2.bfo_expected_outcome ENABLE TRIGGER ALL;
+#ALTER TABLE ufc2.fighter_bout_xref ENABLE TRIGGER ALL;
+#
+#delete from ufc2.bout b2 
+#	where b2.oid 
+#		in (select b.oid 
+#			from ufc2.bout b 
+#		where fight_oid = 'cd200d5f-2813-4ab0-9eb2-f9a026883d79');
+#
+#update ufc2.fight set f_completed = false where oid = 'cd200d5f-2813-4ab0-9eb2-f9a026883d79';
 
 
 def evalIfAllBoutScoreUrls(fight_details):
@@ -66,7 +101,7 @@ def evalIfMissingFightOddsInfo(fight_details):
         print('Fight %s is missing expected outcome data' % (fight_details['fightName']))
     return odds_completion
     
-#   fight_id = "14b9e0f2679a2205"
+#   fight_id = "271fe91f4ba9d2c5"   31ceaf0e670c1578
 def addInfoToAllBouts(fight_id):
     fight_details = getBoutsFromFight(fight_id)
     print("Beginning full parse of %s (%s)" % (fight_details['fightName'], fight_details['fightId']))
@@ -79,9 +114,9 @@ def addInfoToAllBouts(fight_id):
         addBoutsToFight(fight_id)
         print("Refreshing fight info after adding bouts")
         fight_details = getBoutsFromFight(fight_id)
-    if ADD_ODDS and fight_details['bestFightOddsUrl'] is None:
-        addFightOddsUrl(fight_details)
-    for bout_detail in fight_details['bouts']:  
+#    if ADD_ODDS and fight_details['bestFightOddsUrl'] is None:
+#        addFightOddsUrl(fight_details)
+    for bout_detail in fight_details['bouts']:
         if (bout_detail['completed']):
             if (len(bout_detail['fighterBoutXRefs']) != 2):
                 print("~~~~~~ INCOMPLETE BOUT (%s) ~~~~~~~~~" % (bout_detail['oid']))
@@ -98,12 +133,12 @@ def addInfoToAllBouts(fight_id):
             if (evalIfMissingBoutScores(refreshed_bout_detail)):
                 print("Adding bout round scores")
                 scrapeBoutScores(bout_detail['oid'])
-        if bout_detail['gender'] == 'MALE':
-            print("Updating ML scores")
-            insert_new_ml_scores(bout_detail['boutId'])
-            insert_new_ml_prob(bout_detail['boutId'])
-            print("Updating ELO scores")
-            populate_elo(bouts = [bout_detail['boutId']], refit = False)
+#        if bout_detail['gender'] == 'MALE':
+        print("Updating ML scores")
+        insert_new_ml_scores(bout_detail['boutId'])
+        insert_new_ml_prob(bout_detail['boutId'])
+        print("Updating ELO scores")
+        populate_elo(bouts = [bout_detail['boutId']], refit = False)
 #        populate_elo_bout(bout_detail['boutId'])
     fight_details_refreshed = getBoutsFromFight(fight_id)
     odds_completion = evalIfMissingFightOddsInfo(fight_details_refreshed)
@@ -185,13 +220,42 @@ def addBoutMissingRoundScores(bout_details):
      
 def addInfoToAllFights():
     fight_id_list = getAllFightIds()
-    for fight_id in fight_id_list:
+    
+#    fight_id_list = ['dbd198f780286aca',
+#'c32eab6c2119e989',
+#'2eab7a6c8b0ed8cc',
+#'1e13936d708bcff7',
+#'4c12aa7ca246e7a4',
+#'14b9e0f2679a2205',
+#
+#'dfb965c9824425db',
+#'5f8e00c27b7e7410',
+#'898337ef520fe4d3',
+#'53278852bcd91e11',
+#'0b5b6876c2a4723f',
+#
+#'fc9a9559a05f2704',
+#'33b2f68ef95252e0',
+#'5df17b3620145578',
+#'b26d3e3746fb4024',
+#'44aa652b181bcf68',
+#'0c1773639c795466']
+    for fight_id in reversed(fight_id_list):
         addInfoToAllBouts(fight_id)
 
+def pop_year_bouts():
+    for year in range(2005, 2021):
+        fights = getTrainingFights(year)
+        for fight in fights:
+#            try:
+                addInfoToAllBouts(fight)
+#            except:
+#                input("error.. proceed?")
+        
 def addScoresToAllFights():
     fight_id_list = getAllFightIds()    
     for fight_id in fight_id_list:
         addFightMissingRoundScores(fight_id)
         
 #if __name__ == '__main__':
-#    addInfoToAllFights()
+#    pop_year_bouts()
