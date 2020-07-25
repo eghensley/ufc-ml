@@ -102,8 +102,8 @@ class bet_eval:
     def _predict(self, f, fbx):
         if fbx['expOdds'] is None:
             self._skip = True
-            print(fbx)
-            print(' missing expected odds ')
+#            print(fbx)
+#            print(' missing expected odds ')
             return
         self._bout_data['%s_prev_fights' % (f)] = getLastEloCount(fbx['fighter']['oid'], self._bout_info['fightOid'])
         
