@@ -545,10 +545,10 @@ class elo_model:
     def proc_bout(self):
         self.reset_bout()
         self.bout_info = refreshBout(self.bout_oid)
-        if self.bout_info['gender'] != 'MALE':
-            if self.debug:
-                print("Skipping bout %s.. not male" % (self.bout_info['oid']))
-            return
+#        if self.bout_info['gender'] != 'MALE':
+#            if self.debug:
+#                print("Skipping bout %s.. not male" % (self.bout_info['oid']))
+#            return
         try:
             self.prep_fighter(0)
             self.prep_fighter(1)
@@ -783,7 +783,7 @@ def populate_elo(bouts = None, refit = False):
         BOUTS = bouts
         
     elo_mod = elo_model(cache = False,
-                            debug = False,
+                            debug = True,
 #                            sd = params['elo_sd'], 
 #                            n_sims = params['elo_n_sims'],
 #                            fight_threshold = params['elo_fight_treshold'],

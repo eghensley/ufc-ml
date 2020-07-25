@@ -101,7 +101,7 @@ def evalIfMissingFightOddsInfo(fight_details):
         print('Fight %s is missing expected outcome data' % (fight_details['fightName']))
     return odds_completion
     
-#   fight_id = "271fe91f4ba9d2c5"   31ceaf0e670c1578
+#   fight_id = "dbd198f780286aca"   31ceaf0e670c1578
 def addInfoToAllBouts(fight_id):
     fight_details = getBoutsFromFight(fight_id)
     print("Beginning full parse of %s (%s)" % (fight_details['fightName'], fight_details['fightId']))
@@ -117,6 +117,9 @@ def addInfoToAllBouts(fight_id):
 #    if ADD_ODDS and fight_details['bestFightOddsUrl'] is None:
 #        addFightOddsUrl(fight_details)
     for bout_detail in fight_details['bouts']:
+#        if (bout_detail['oid'] != '687ae64b-f71c-447a-a5ac-1d44c472b7f0'):
+#            continue
+#        adsfasdf
         if (bout_detail['completed']):
             if (len(bout_detail['fighterBoutXRefs']) != 2):
                 print("~~~~~~ INCOMPLETE BOUT (%s) ~~~~~~~~~" % (bout_detail['oid']))
@@ -133,19 +136,19 @@ def addInfoToAllBouts(fight_id):
             if (evalIfMissingBoutScores(refreshed_bout_detail)):
                 print("Adding bout round scores")
                 scrapeBoutScores(bout_detail['oid'])
-#        if bout_detail['gender'] == 'MALE':
-        print("Updating ML scores")
-        insert_new_ml_scores(bout_detail['boutId'])
-        insert_new_ml_prob(bout_detail['boutId'])
-        print("Updating ELO scores")
-        populate_elo(bouts = [bout_detail['boutId']], refit = False)
+        if bout_detail['gender'] != 'MALE':
+            print("Updating ML scores")
+            insert_new_ml_scores(bout_detail['boutId'])
+            insert_new_ml_prob(bout_detail['boutId'])
+            print("Updating ELO scores")
+            populate_elo(bouts = [bout_detail['boutId']], refit = False)
 #        populate_elo_bout(bout_detail['boutId'])
-    fight_details_refreshed = getBoutsFromFight(fight_id)
-    odds_completion = evalIfMissingFightOddsInfo(fight_details_refreshed)
-    if odds_completion['odds']:
-        addFightOdds(fight_id)
-    if odds_completion['expectedOutcome']:
-        addFightExpectedOutcomes(fight_id)
+#    fight_details_refreshed = getBoutsFromFight(fight_id)
+#    odds_completion = evalIfMissingFightOddsInfo(fight_details_refreshed)
+#    if odds_completion['odds']:
+#        addFightOdds(fight_id)
+#    if odds_completion['expectedOutcome']:
+#        addFightExpectedOutcomes(fight_id)
 
 def addFightOddsUrls(fight_id):
     fight_details = getBoutsFromFight(fight_id)

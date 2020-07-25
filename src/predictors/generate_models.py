@@ -104,12 +104,12 @@ def generate_new_win_score(data):
     sub_score = sub_model.predict_proba(sub_scale.transform(np.array(data[red_feats['features']]).reshape(1,-1)))[0][1]
     return sub_score
 
-#   fight_id, bout_id = '4834ff149dc9542a', '0e8d5c16eb9cb1cf'
+#   fight_id, bout_id = '4834ff149dc9542a', 'e16f42a666e163d8'
 def insert_new_ml_scores(bout_id):
     round_data = pull_bout_data(bout_id)
     for idx in round_data.index:
-        if round_data.loc[idx]['gender'] != 'M':
-            continue
+#        if round_data.loc[idx]['gender'] != 'M':
+#            continue
         ko_score = generate_new_ko_score(round_data.loc[idx])
         sub_score = generate_new_sub_score(round_data.loc[idx])
         payload = {"oid": idx, "koScore": ko_score, "subScore": sub_score}
@@ -117,7 +117,7 @@ def insert_new_ml_scores(bout_id):
         if resp['errorMsg'] is not None:
             print(resp['errorMsg'])
             
-#    bout_id = 'd4c314616eac8f8b'
+#    bout_id = 'e16f42a666e163d8'
 def insert_new_ml_prob(bout_id):
     bout_detail = refreshBout(bout_id)
     

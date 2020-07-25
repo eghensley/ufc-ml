@@ -58,8 +58,8 @@ def pull_ml_training():
     
 def format_elo_data(bout_oid, use_prev = False):
     bout_info = refreshBout(bout_oid)
-    if bout_info['gender'] == 'FEMALE':
-        return
+#    if bout_info['gender'] == 'FEMALE':
+#        return
     bout_data = {}
 
     bout_data['schedRounds'] = bout_info['schedRounds']
@@ -69,7 +69,6 @@ def format_elo_data(bout_oid, use_prev = False):
         fighter_data['mlOdds'] = fbx['mlOdds']
         if use_prev:
             prev_data = getLastElo(fbx['fighter']['oid'], bout_info['fightOid'])
-            print(prev_data)
 #            print(prev_data)
             if prev_data['offStrikeEloPost'] is None:
                 continue
@@ -236,7 +235,7 @@ def format_elo_data_2(fight):
     bout_training_data['rounds'] = fight['schedRounds']
     return bout_training_data
     
-#   bout_oid = 'd4c314616eac8f8b'
+#   bout_oid = 'e16f42a666e163d8'
 def form_new_ml_odds_data(bout_oid):
     try:
         fight = format_elo_data(bout_oid, use_prev = True)
