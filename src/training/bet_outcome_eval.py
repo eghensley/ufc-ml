@@ -26,7 +26,7 @@ def evalActualWinner(bout):
         return bout['fighterBoutXRefs'][1]['fighter']['fighterId']
     
 class bet_eval:
-    def __init__(self, debug = False, standard_wager = 1, start_bank = 0, bet_intercept = 1, conf_diff_lin = 0, conf_diff_quad = 0, num_fight_lin = 0, num_fight_quad = 0, diff_ceiling = .5, diff_floor = .05, prev_fight_floor = 5, prev_fight_ceiling = 99):
+    def __init__(self, debug = False, bet_female = False, bet_ceiling = None, standard_wager = 1, start_bank = 0, bet_intercept = 1, conf_diff_lin = 0, conf_diff_quad = 0, num_fight_lin = 0, num_fight_quad = 0, diff_ceiling = .5, diff_floor = .05, prev_fight_floor = 5, prev_fight_ceiling = 99):
         self.bank = start_bank
         self.standard_wager = standard_wager
 
@@ -42,6 +42,8 @@ class bet_eval:
         self.num_fight_lin = num_fight_lin
         self.num_fight_quad = num_fight_quad
         self.debug = debug
+        self.bet_ceiling = bet_ceiling
+        self.bet_female = bet_female
         
         self.results = []
         self.model_id = str(uuid.uuid4())
@@ -55,7 +57,9 @@ class bet_eval:
                        'conf_diff_quad': self.conf_diff_quad,
                        'num_fight_lin': self.num_fight_lin,
                        'num_fight_quad': self.num_fight_quad,
-                       'standard_wager': self.standard_wager
+                       'standard_wager': self.standard_wager,
+                       'bet_ceiling': self.bet_ceiling,
+                       'bet_female': self.bet_female
                        }
         
         self._skip = False
@@ -71,8 +75,8 @@ class bet_eval:
 #        print("$%s" % (to_wager))
         if to_wager < 0:
             to_wager = 0
-#        if to_wager > 5:
-#            to_wager = 5
+        if self.bet_ceiling is not None and to_wager > self.bet_ceiling:
+            to_wager = self.bet_ceiling
         return to_wager
 
     def _reset_bout(self):
@@ -98,6 +102,7 @@ class bet_eval:
     def _predict(self, f, fbx):
         if fbx['expOdds'] is None:
             self._skip = True
+            print(fbx)
             print(' missing expected odds ')
             return
         self._bout_data['%s_prev_fights' % (f)] = getLastEloCount(fbx['fighter']['oid'], self._bout_info['fightOid'])
@@ -127,64 +132,27 @@ class bet_eval:
         self._bout_info = refreshBout(bout_id)
         if self.debug:
             print('%s VS %s' % (self._bout_info['fighterBoutXRefs'][0]['fighter']['fighterName'], self._bout_info['fighterBoutXRefs'][1]['fighter']['fighterName']))
-#        if self._bout_info['gender'] == 'MALE':
-        for f, (fbx) in enumerate(self._bout_info['fighterBoutXRefs']):
-            self._predict(f, fbx)
+        if not self.bet_female and self._bout_info['gender'] == 'MALE':
+            for f, (fbx) in enumerate(self._bout_info['fighterBoutXRefs']):
+                self._predict(f, fbx)
+                if self.score:
+                    self._score_pred(f, fbx)
+            if self._skip:
+                if self.debug:
+                    print('skipping bout due to filter constraints')
+                return
             if self.score:
-                self._score_pred(f, fbx)
-        if self._skip:
-            if self.debug:
-                print('skipping bout due to filter constraints')
-            return
-        if self.score:
-            bet_result = 0
-        else:
-            bout_preds = {}
-            
-        if self._bout_data['0_odds_diff'] > 0:
-            if self.score:
-                if self._bout_data['0_outcome'] == 1:
-                    bet_result = calcWinnings(self._wager_funct(self._bout_data['0_odds_diff'], self._bout_data['0_prev_fights'], self._bout_data['1_prev_fights']), self._bout_data['0_ml_odds'])
-                else:
-                    bet_result = -1 * self._wager_funct(self._bout_data['0_odds_diff'], self._bout_data['0_prev_fights'], self._bout_data['1_prev_fights'])
+                bet_result = 0
             else:
-                bout_preds['sug_wager'] = self._wager_funct(self._bout_data['0_odds_diff'], self._bout_data['0_prev_fights'], self._bout_data['1_prev_fights'])
-                bout_preds['pred_winner_oid'] = self._bout_info['fighterBoutXRefs'][0]['fighter']['oid']
-                bout_preds['pred_winner_name'] = self._bout_info['fighterBoutXRefs'][0]['fighter']['fighterName']
-                bout_preds['bout_name'] = '%s vs %s' % (self._bout_info['fighterBoutXRefs'][0]['fighter']['fighterName'], self._bout_info['fighterBoutXRefs'][1]['fighter']['fighterName'])
-                bout_preds['ml_odds'] = self._bout_data['0_ml_odds']
-                bout_preds['exp_prob'] = self._bout_data['0_exp_prob']
-                bout_preds['odds_diff'] = self._bout_data['0_odds_diff']
-                bout_preds['exp_outcome'] = ((bout_preds['exp_prob']/100) * calcWinnings(bout_preds['sug_wager'], bout_preds['ml_odds'])) - ((1-(bout_preds['exp_prob']/100)) * bout_preds['sug_wager'])
-                bout_preds['exp_roi'] = bout_preds['exp_outcome'] / bout_preds['sug_wager']
-                if self._bout_data['0_odds_diff'] < self.diff_floor * 100 or self._bout_data['0_odds_diff'] > self.diff_ceiling * 100:
-                    bout_preds['BET'] = 'No'
+                bout_preds = {}
+                
+            if self._bout_data['0_odds_diff'] > 0:
+                if self.score:
+                    if self._bout_data['0_outcome'] == 1:
+                        bet_result = calcWinnings(self._wager_funct(self._bout_data['0_odds_diff'], self._bout_data['0_prev_fights'], self._bout_data['1_prev_fights']), self._bout_data['0_ml_odds'])
+                    else:
+                        bet_result = -1 * self._wager_funct(self._bout_data['0_odds_diff'], self._bout_data['0_prev_fights'], self._bout_data['1_prev_fights'])
                 else:
-                    bout_preds['BET'] = 'Yes'
-                    
-        elif self._bout_data['1_odds_diff'] > 0:
-            if self.score:
-                if self._bout_data['1_outcome'] == 1:
-                    bet_result = calcWinnings(self._wager_funct(self._bout_data['1_odds_diff'], self._bout_data['0_prev_fights'], self._bout_data['1_prev_fights']), self._bout_data['1_ml_odds'])
-                else:
-                    bet_result = -1 * self._wager_funct(self._bout_data['1_odds_diff'], self._bout_data['0_prev_fights'], self._bout_data['1_prev_fights'])              
-            else:
-                bout_preds['sug_wager'] = self._wager_funct(self._bout_data['1_odds_diff'], self._bout_data['0_prev_fights'], self._bout_data['1_prev_fights'])
-                bout_preds['pred_winner_oid'] = self._bout_info['fighterBoutXRefs'][1]['fighter']['oid']
-                bout_preds['pred_winner_name'] = self._bout_info['fighterBoutXRefs'][1]['fighter']['fighterName']
-                bout_preds['bout_name'] = '%s vs %s' % (self._bout_info['fighterBoutXRefs'][0]['fighter']['fighterName'], self._bout_info['fighterBoutXRefs'][1]['fighter']['fighterName'])
-                bout_preds['ml_odds'] = self._bout_data['1_ml_odds']
-                bout_preds['exp_prob'] = self._bout_data['1_exp_prob']
-                bout_preds['odds_diff'] = self._bout_data['1_odds_diff']
-                bout_preds['exp_outcome'] = ((bout_preds['exp_prob']/100) * calcWinnings(bout_preds['sug_wager'], bout_preds['ml_odds'])) - ((1-(bout_preds['exp_prob']/100)) * bout_preds['sug_wager'])
-                bout_preds['exp_roi'] = bout_preds['exp_outcome'] / bout_preds['sug_wager']
-                if self._bout_data['1_odds_diff'] < self.diff_floor * 100 or self._bout_data['1_odds_diff'] > self.diff_ceiling * 100:
-                    bout_preds['BET'] = 'No'
-                else:
-                    bout_preds['BET'] = 'Yes'
-        else:
-            if not self.score:
-                if self._bout_data['0_odds_diff'] > self._bout_data['1_odds_diff']:
                     bout_preds['sug_wager'] = self._wager_funct(self._bout_data['0_odds_diff'], self._bout_data['0_prev_fights'], self._bout_data['1_prev_fights'])
                     bout_preds['pred_winner_oid'] = self._bout_info['fighterBoutXRefs'][0]['fighter']['oid']
                     bout_preds['pred_winner_name'] = self._bout_info['fighterBoutXRefs'][0]['fighter']['fighterName']
@@ -193,10 +161,18 @@ class bet_eval:
                     bout_preds['exp_prob'] = self._bout_data['0_exp_prob']
                     bout_preds['odds_diff'] = self._bout_data['0_odds_diff']
                     bout_preds['exp_outcome'] = ((bout_preds['exp_prob']/100) * calcWinnings(bout_preds['sug_wager'], bout_preds['ml_odds'])) - ((1-(bout_preds['exp_prob']/100)) * bout_preds['sug_wager'])
+                    bout_preds['exp_roi'] = bout_preds['exp_outcome'] / bout_preds['sug_wager']
                     if self._bout_data['0_odds_diff'] < self.diff_floor * 100 or self._bout_data['0_odds_diff'] > self.diff_ceiling * 100:
                         bout_preds['BET'] = 'No'
                     else:
-                        bout_preds['BET'] = 'Yes'      
+                        bout_preds['BET'] = 'Yes'
+                        
+            elif self._bout_data['1_odds_diff'] > 0:
+                if self.score:
+                    if self._bout_data['1_outcome'] == 1:
+                        bet_result = calcWinnings(self._wager_funct(self._bout_data['1_odds_diff'], self._bout_data['0_prev_fights'], self._bout_data['1_prev_fights']), self._bout_data['1_ml_odds'])
+                    else:
+                        bet_result = -1 * self._wager_funct(self._bout_data['1_odds_diff'], self._bout_data['0_prev_fights'], self._bout_data['1_prev_fights'])              
                 else:
                     bout_preds['sug_wager'] = self._wager_funct(self._bout_data['1_odds_diff'], self._bout_data['0_prev_fights'], self._bout_data['1_prev_fights'])
                     bout_preds['pred_winner_oid'] = self._bout_info['fighterBoutXRefs'][1]['fighter']['oid']
@@ -206,18 +182,47 @@ class bet_eval:
                     bout_preds['exp_prob'] = self._bout_data['1_exp_prob']
                     bout_preds['odds_diff'] = self._bout_data['1_odds_diff']
                     bout_preds['exp_outcome'] = ((bout_preds['exp_prob']/100) * calcWinnings(bout_preds['sug_wager'], bout_preds['ml_odds'])) - ((1-(bout_preds['exp_prob']/100)) * bout_preds['sug_wager'])
+                    bout_preds['exp_roi'] = bout_preds['exp_outcome'] / bout_preds['sug_wager']
                     if self._bout_data['1_odds_diff'] < self.diff_floor * 100 or self._bout_data['1_odds_diff'] > self.diff_ceiling * 100:
                         bout_preds['BET'] = 'No'
                     else:
-                        bout_preds['BET'] = 'Yes'                        
-        
-        if self.score:
-            self.results.append(bet_result)
+                        bout_preds['BET'] = 'Yes'
+            else:
+                if not self.score:
+                    if self._bout_data['0_odds_diff'] > self._bout_data['1_odds_diff']:
+                        bout_preds['sug_wager'] = self._wager_funct(self._bout_data['0_odds_diff'], self._bout_data['0_prev_fights'], self._bout_data['1_prev_fights'])
+                        bout_preds['pred_winner_oid'] = self._bout_info['fighterBoutXRefs'][0]['fighter']['oid']
+                        bout_preds['pred_winner_name'] = self._bout_info['fighterBoutXRefs'][0]['fighter']['fighterName']
+                        bout_preds['bout_name'] = '%s vs %s' % (self._bout_info['fighterBoutXRefs'][0]['fighter']['fighterName'], self._bout_info['fighterBoutXRefs'][1]['fighter']['fighterName'])
+                        bout_preds['ml_odds'] = self._bout_data['0_ml_odds']
+                        bout_preds['exp_prob'] = self._bout_data['0_exp_prob']
+                        bout_preds['odds_diff'] = self._bout_data['0_odds_diff']
+                        bout_preds['exp_outcome'] = ((bout_preds['exp_prob']/100) * calcWinnings(bout_preds['sug_wager'], bout_preds['ml_odds'])) - ((1-(bout_preds['exp_prob']/100)) * bout_preds['sug_wager'])
+                        if self._bout_data['0_odds_diff'] < self.diff_floor * 100 or self._bout_data['0_odds_diff'] > self.diff_ceiling * 100:
+                            bout_preds['BET'] = 'No'
+                        else:
+                            bout_preds['BET'] = 'Yes'      
+                    else:
+                        bout_preds['sug_wager'] = self._wager_funct(self._bout_data['1_odds_diff'], self._bout_data['0_prev_fights'], self._bout_data['1_prev_fights'])
+                        bout_preds['pred_winner_oid'] = self._bout_info['fighterBoutXRefs'][1]['fighter']['oid']
+                        bout_preds['pred_winner_name'] = self._bout_info['fighterBoutXRefs'][1]['fighter']['fighterName']
+                        bout_preds['bout_name'] = '%s vs %s' % (self._bout_info['fighterBoutXRefs'][0]['fighter']['fighterName'], self._bout_info['fighterBoutXRefs'][1]['fighter']['fighterName'])
+                        bout_preds['ml_odds'] = self._bout_data['1_ml_odds']
+                        bout_preds['exp_prob'] = self._bout_data['1_exp_prob']
+                        bout_preds['odds_diff'] = self._bout_data['1_odds_diff']
+                        bout_preds['exp_outcome'] = ((bout_preds['exp_prob']/100) * calcWinnings(bout_preds['sug_wager'], bout_preds['ml_odds'])) - ((1-(bout_preds['exp_prob']/100)) * bout_preds['sug_wager'])
+                        if self._bout_data['1_odds_diff'] < self.diff_floor * 100 or self._bout_data['1_odds_diff'] > self.diff_ceiling * 100:
+                            bout_preds['BET'] = 'No'
+                        else:
+                            bout_preds['BET'] = 'Yes'                        
+            
+            if self.score:
+                self.results.append(bet_result)
+            else:
+                self._predictions[bout_id] = bout_preds
         else:
-            self._predictions[bout_id] = bout_preds
-#        else:
-#            if self.debug:
-#                print('skipping due to female fight')
+            if self.debug:
+                print('skipping due to female fight')
                 
     def _proc_fight(self, fight_id):
         self._predictions = {}
@@ -282,7 +287,8 @@ def _opt_betting(trial):
 #    'num_fight_lin': trial.suggest_uniform('num_fight_lin', 0, 0.5),
     'conf_diff_quad': trial.suggest_uniform('conf_diff_quad', -0.5, 0.5),
 #    'num_fight_quad': trial.suggest_uniform('num_fight_quad', -0.5, 0.5),
-
+    'bet_ceiling': trial.suggest_int('bet_ceiling', 10, 200),
+    'bet_female': trial.suggest_categorical('bet_female', [True, False])
     }
     
     better = bet_eval(debug = False,
@@ -294,8 +300,11 @@ def _opt_betting(trial):
 #                      prev_fight_ceiling = param['prev_fight_ceiling'],
                       prev_fight_floor = param['prev_fight_floor'],
                       diff_ceiling = param['diff_ceiling'],
-                      diff_floor = param['diff_floor']
+                      diff_floor = param['diff_floor'],
+                      bet_ceiling = param['bet_ceiling'],
+                      bet_female = param['bet_female']
                       )
+    
     return better.evaluate(fight_list = ["fc9a9559a05f2704",
                                     "33b2f68ef95252e0",
                                     "5df17b3620145578",
@@ -304,7 +313,7 @@ def _opt_betting(trial):
                                     "0c1773639c795466"]
                             )    
     
-def optimize_bet(clf = 'light', domain = 'strike', trials = 5000):
+def optimize_bet(clf = 'light', domain = 'strike', trials = 2000):
     study = optuna.create_study(direction='maximize')
     study.optimize(_opt_betting, n_trials=trials)      
     print('Number of finished trials:', len(study.trials))
@@ -386,7 +395,8 @@ def gen_score_report():
                       diff_floor = param['diff_floor']
                               )
             res = better.evaluate(full_score = True, 
-                                  fight_list = ["dfb965c9824425db",
+                                  fight_list = ["14b9e0f2679a2205",
+                                                "dfb965c9824425db",
                                                 "5f8e00c27b7e7410",
                                                 "898337ef520fe4d3",
                                                 "53278852bcd91e11",

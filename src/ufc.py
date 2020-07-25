@@ -10,7 +10,12 @@ from training import tune_ml, fill_ml_training_scores, optimize_bet, predict_bet
 from elo import optimize_elo, populate_elo
 from db import pop_future_bouts, pop_year_bouts, update_mybookie
 
-pop_year_bouts()
+optimize_bet(trials = 5)
+
+#pop_year_bouts()
+
+
+
 #import argparse
 ## fix ufc odds from 6-6
 #FIGHT_ID = '1e13936d708bcff7'
