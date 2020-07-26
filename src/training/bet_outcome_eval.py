@@ -444,9 +444,62 @@ def gen_score_report():
     pos_models_df = pd.DataFrame.from_dict(pos_models).T
     pos_models_df.to_csv("betting_model_params_new.csv")
     
+
+def val_fights():
+    results = {}
+    for file in ['f140b52a-41de-4d75-b27e-113c67da1e03',
+                'adf467c4-3e84-418f-997f-53a93bfa62bb',
+                'da487a00-1f4e-4877-bdb3-0a9f95fd848a',
+                'f3f53f15-b612-452f-90d8-b794164b3df8',
+                'e4376d9a-7ee0-47ca-8d7f-c9d72ad69570',
+                '47a56773-2665-495e-8e41-505755d38f6a',
+                '0f1a2c8a-ce31-4ca6-bb74-5f6131f3a5ad',
+                '208e43c2-5a51-49ab-aa7d-a4ab52048d92',
+                '4d7143ce-831d-4c17-ba4f-6cb538ad81be',
+                'c45192e0-2eda-490b-bd54-5e287841256e',
+                '237cbd73-1582-4418-bed1-592380086047',
+                '0d3987a1-b5bb-4a7e-911d-7de76e6b979c',
+                '3d4e12f3-beb5-4f12-948e-bda58ea03481',
+                '5671e0a2-de11-43e0-8a50-67eaedc3113a',
+                '08e0c5c7-4fb6-4130-a723-2fa0bd4a9bc7',
+                'e9589935-4fab-4a75-a0cd-a8cc645d4384',
+                'a966423a-dace-4901-8301-c597936c9ee8',
+                '1c370556-5b27-4a66-a625-6ff42ef3cbe2',
+                '760b2643-6a0f-4781-908d-10482e670bcc',
+                '7cc9c001-7f8f-41af-866a-d44248e40a17']:
+        with open('training/bet/models/%s.json' % (file), 'r') as r:
+            param = json.load(r)    
+        bettor = bet_eval(debug = True,
+                          conf_diff_lin = param['conf_diff_lin'],
+                          conf_diff_quad = param['conf_diff_quad'],
+                          num_fight_lin = param['num_fight_lin'],
+                          num_fight_quad = param['num_fight_quad'],
+                          bet_intercept = param['bet_intercept'],
+                          prev_fight_ceiling = param['prev_fight_ceiling'],
+                          prev_fight_floor = param['prev_fight_floor'],
+                          diff_ceiling = param['diff_ceiling'],
+                          diff_floor = param['diff_floor'],
+                          bet_ceiling = param['bet_ceiling'],
+                          bet_female = param['bet_female']
+                          )      
+        res = bettor.evaluate(full_score = True, 
+                              fight_list = ["dbd198f780286aca",
+                                            "c32eab6c2119e989",
+                                            "2eab7a6c8b0ed8cc"
+                                            ],
+                                save_results = False,
+                                validate = True
+                                )    
+        results[file] = res
+    with open('new_validation_results.json', 'w') as b:
+        json.dump(results, b)    
+        
     
+    
+
+
 def validate_new_fights():
-    with open('predictors/bet/bettor_config.json', 'r') as r:
+    with open('predictors/bet/bettor_config_new.json', 'r') as r:
         param = json.load(r)    
     bettor = bet_eval(debug = True,
                       conf_diff_lin = param['conf_diff_lin'],
@@ -457,7 +510,9 @@ def validate_new_fights():
                       prev_fight_ceiling = param['prev_fight_ceiling'],
                       prev_fight_floor = param['prev_fight_floor'],
                       diff_ceiling = param['diff_ceiling'],
-                      diff_floor = param['diff_floor']
+                      diff_floor = param['diff_floor'],
+                      bet_ceiling = param['bet_ceiling'],
+                      bet_female = param['bet_female']
                       )      
     res = bettor.evaluate(full_score = True, 
                           fight_list = ["dbd198f780286aca",
