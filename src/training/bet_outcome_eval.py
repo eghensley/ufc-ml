@@ -392,7 +392,9 @@ def gen_score_report():
                       prev_fight_ceiling = param['prev_fight_ceiling'],
                       prev_fight_floor = param['prev_fight_floor'],
                       diff_ceiling = param['diff_ceiling'],
-                      diff_floor = param['diff_floor']
+                      diff_floor = param['diff_floor'],
+                      bet_ceiling = param['bet_ceiling'],
+                      bet_female = param['bet_female']
                               )
             res = better.evaluate(full_score = True, 
                                   fight_list = ["1e13936d708bcff7",
@@ -437,10 +439,10 @@ def gen_score_report():
         mod['tot_val_rank'] = mod['val_average_rank'] + mod['val_gross_rank']
         pos_models[pos_score] = mod
         
-    with open('betting_model_params.json', 'w') as b:
+    with open('betting_model_params_new.json', 'w') as b:
         json.dump(pos_models, b)
     pos_models_df = pd.DataFrame.from_dict(pos_models).T
-    pos_models_df.to_csv("betting_model_params.csv")
+    pos_models_df.to_csv("betting_model_params_new.csv")
     
     
 def validate_new_fights():
