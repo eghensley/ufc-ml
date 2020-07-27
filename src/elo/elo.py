@@ -11,7 +11,7 @@ if __name__ == "__main__":
     sys.path.append("..")
 
 import os
-from spring.api_wrappers import getAllBouts, refreshBout, getLastElo, updateElo, clearElo, getYearBouts
+from spring.api_wrappers import updateRanking, getAllBouts, refreshBout, getLastElo, updateElo, clearElo, getYearBouts
 import math
 import json
 import pandas as pd
@@ -42,6 +42,14 @@ def days_between(d1, d2):
     d2 = datetime.strptime(d2, "%Y-%m-%d")
     return abs((d2 - d1).days)
 
+def prep_rank_update_payload(fighter_stats, bout):
+    payload = {'fighter': {'oid': fighter_stats['stats']['fighter']['oid']},
+               'fightDate':bout['fightDate'] ,
+               'weightClass': bout['weightClass'],
+               'fighterBoutXRef': {'oid': fighter_stats['stats']['oid']}
+    }
+    return payload
+    
 class elo_model:
     def __init__(self, target = 'mse', cache = True, prefit = False, alll = False, strike = True, grapp = True, ko = True, sub = True, sim = True, debug = False, sd = .025, n_sims = 100, fight_threshold = 1, strike_damper = .5, grappling_damper = .5, ko_damper = .5, sub_damper = .5, default_off_strike = .15, default_def_strike = .85, default_off_grappling = .15, default_def_grappling = .85, default_off_ko = .5, default_def_ko = .5, default_off_sub = .5, default_def_sub = .5):
         self.iter_scores = {'offStrikeElo':[], 'defStrikeElo':[], 'offGrapplingElo':[], 'defGrapplingElo':[], 'powerStrikeElo':[], 'chinStrikeElo':[], 'subGrapplingElo':[], 'evasGrapplingElo':[]}
@@ -533,14 +541,18 @@ class elo_model:
                                         }
         else:
             fighter_1_update = updateElo(self.fighter_info[self.fighters[0]]['elo'])
-#            if self.debug:
-#                print(self.fighter_info[self.fighters[0]]['elo'])
-#                print(fighter_1_update)
             if fighter_1_update['errorMsg'] is not None:
                 print(fighter_1_update['errorMsg'])
+            else:
+                print('Updating fighter rank')
+                updateRanking(prep_rank_update_payload(self.fighter_info[self.fighters[0]], self.bout_info))
+
             fighter_2_update = updateElo(self.fighter_info[self.fighters[1]]['elo'])
             if fighter_2_update['errorMsg'] is not None:
                 print(fighter_2_update['errorMsg'])
+            else:
+                print('Updating fighter rank')
+                updateRanking(prep_rank_update_payload(self.fighter_info[self.fighters[1]], self.bout_info))   
             
     def proc_bout(self):
         self.reset_bout()

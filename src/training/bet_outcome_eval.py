@@ -575,9 +575,9 @@ def add_best_model():
     with open('predictors/bet/bettor_config.json', 'w') as w:
         json.dump(mod, w)
     
-#    fight_id = 'ddbd0d6259ce57cc'
+#    fight_id = 'dde70a112e053a6c'
 def predict_bet_winners(fight_id):
-    with open('predictors/bet/bettor_config.json', 'r') as r:
+    with open('predictors/bet/bettor_config_new.json', 'r') as r:
         param = json.load(r)    
     bettor = bet_eval(debug = True,
                       conf_diff_lin = param['conf_diff_lin'],
@@ -588,7 +588,9 @@ def predict_bet_winners(fight_id):
                       prev_fight_ceiling = param['prev_fight_ceiling'],
                       prev_fight_floor = param['prev_fight_floor'],
                       diff_ceiling = param['diff_ceiling'],
-                      diff_floor = param['diff_floor']
+                      diff_floor = param['diff_floor'],
+                      bet_ceiling = param['bet_ceiling'],
+                      bet_female = param['bet_female']
                       )  
     preds = bettor.predict(fight_id)
     print(preds)

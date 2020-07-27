@@ -15,14 +15,18 @@ from .config import CONFIG
 import requests 
 
 def clearElo():
-    r = requests.get(url = CONFIG['spring']['rest']['CLEAR_ELO'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT']))
+    headers = requests.utils.default_headers()
+    headers['password'] = str(CONFIG['spring']['PW'])
+    r = requests.get(url = CONFIG['spring']['rest']['CLEAR_ELO'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT']), headers = headers)
     response = r.json()
     return response
 
 def updateElo(payload):
+    headers = requests.utils.default_headers()
+    headers['password'] = str(CONFIG['spring']['PW'])
     while True:
         try:
-            r = requests.post(url = CONFIG['spring']['rest']['UPDATE_ELO'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT']), json = payload)
+            r = requests.post(url = CONFIG['spring']['rest']['UPDATE_ELO'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT']), json = payload, headers = headers)
             response = r.json()
             return response
         except requests.exceptions.RequestException as err:
@@ -81,12 +85,16 @@ def getLastElo(fighterOid, fightOid, debug = False):
             pass
         
 def saveMlScore(payload):
-    r = requests.post(url = CONFIG['spring']['rest']['ADD_ML_SCORE'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT']), json = payload)
+    headers = requests.utils.default_headers()
+    headers['password'] = str(CONFIG['spring']['PW'])
+    r = requests.post(url = CONFIG['spring']['rest']['ADD_ML_SCORE'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT']), json = payload, headers = headers)
     response = r.json()
     return response
 
 def saveBoutMlScore(payload):
-    r = requests.post(url = CONFIG['spring']['rest']['ADD_BOUT_ML_SCORE'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT']), json = payload)
+    headers = requests.utils.default_headers()
+    headers['password'] = str(CONFIG['spring']['PW'])
+    r = requests.post(url = CONFIG['spring']['rest']['ADD_BOUT_ML_SCORE'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT']), json = payload, headers = headers)
     response = r.json()
     return response
 
@@ -98,18 +106,24 @@ def getBoutData(boutOid):
     return response['response']
 
 def addRoundScore(oid, round_dict, fighter_name):
-    r = requests.post(url = CONFIG['spring']['rest']['ADD_ROUND_SCORE'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], oid), json = round_dict)
+    headers = requests.utils.default_headers()
+    headers['password'] = str(CONFIG['spring']['PW'])
+    r = requests.post(url = CONFIG['spring']['rest']['ADD_ROUND_SCORE'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], oid), json = round_dict, headers = headers)
     response = r.json() 
     if response['status'] != 'OK':
         print("Save for %s round %s failed with.. %s" % (fighter_name, round_dict['round'], response['errorMsg']))
 
 def addFutBoutData(payload):
-    r = requests.post(url = CONFIG['spring']['rest']['ADD_FUT_BOUT_SUMMARY'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT']), json = payload)
+    headers = requests.utils.default_headers()
+    headers['password'] = str(CONFIG['spring']['PW'])
+    r = requests.post(url = CONFIG['spring']['rest']['ADD_FUT_BOUT_SUMMARY'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT']), json = payload, headers = headers)
     response = r.json() 
     return response
 
 def addMyBookieOdds(payload):
-    r = requests.post(url = CONFIG['spring']['rest']['ADD_MY_BOOKIE_ODDS'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT']), json = payload)
+    headers = requests.utils.default_headers()
+    headers['password'] = str(CONFIG['spring']['PW'])
+    r = requests.post(url = CONFIG['spring']['rest']['ADD_MY_BOOKIE_ODDS'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT']), json = payload, headers = headers)
     response = r.json() 
     return response
                     
@@ -134,13 +148,21 @@ def getNewBouts():
     return response['response']
 
 def addBoutsToFight(fight_id):
-    r = requests.get(url = CONFIG['spring']['rest']['ADD_BOUTS_TO_FIGHT'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], fight_id))
+    headers = requests.utils.default_headers()
+    headers['password'] = str(CONFIG['spring']['PW'])
+    r = requests.get(url = CONFIG['spring']['rest']['ADD_BOUTS_TO_FIGHT'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], fight_id), headers = headers)
     response = r.json()
-    print(response)
-    print("Add Bouts to Fight %s completed %s with %s bouts found and %s completed" % (fight_id, response['status'], response['itemsFound'], response['itemsCompleted']))
-
+    if (response['status'] != 'OK'):
+        print("Add Bouts to Fight %s failed with %s" % (fight_id, response['errorMsg']))
+        return False
+    else:
+        print("Add Bouts to Fight %s completed %s with %s bouts found and %s completed" % (fight_id, response['status'], response['itemsFound'], response['itemsCompleted']))
+        return True
+    
 def addBoutsToFutureFight(fight_id):
-    r = requests.get(url = CONFIG['spring']['rest']['ADD_BOUTS_TO_FUTURE_FIGHT'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], fight_id))
+    headers = requests.utils.default_headers()
+    headers['password'] = str(CONFIG['spring']['PW'])
+    r = requests.get(url = CONFIG['spring']['rest']['ADD_BOUTS_TO_FUTURE_FIGHT'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], fight_id), headers = headers)
     response = r.json()
     print("Add Bouts to Fight %s completed %s with %s bouts found and %s completed" % (fight_id, response['status'], response['itemsFound'], response['itemsCompleted']))
 
@@ -154,7 +176,9 @@ def getBoutsFromFight(fight_id):
         return response['response']
     
 def futureFightUpdate():
-    r = requests.get(url = CONFIG['spring']['rest']['INIT_FUTURE_FIGHT_URL'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT']))
+    headers = requests.utils.default_headers()
+    headers['password'] = str(CONFIG['spring']['PW'])
+    r = requests.get(url = CONFIG['spring']['rest']['INIT_FUTURE_FIGHT_URL'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT']), headers = headers)
     response = r.json()
     if (response['errorMsg'] is not None):
         print(response['errorMsg'])
@@ -169,7 +193,9 @@ def addBoutScoreUrls(fight_oid):
     print("Add Bouts Score URLs to Fight %s completed with %s with %s bouts found and %s completed" % (fight_oid, response['status'], response['itemsFound'], response['itemsCompleted']))
 
 def addBoutDetails(fight_id, bout_id):
-    r = requests.get(url = CONFIG['spring']['rest']['ADD_BOUTS_DETAILS'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], fight_id, bout_id))
+    headers = requests.utils.default_headers()
+    headers['password'] = str(CONFIG['spring']['PW'])
+    r = requests.get(url = CONFIG['spring']['rest']['ADD_BOUTS_DETAILS'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], fight_id, bout_id),  headers = headers)
     response = r.json()
     if (response['status'] != 'OK'):
         print("Add Bouts Details to Bout %s failed" % (bout_id))
@@ -179,7 +205,9 @@ def addBoutDetails(fight_id, bout_id):
         return True
 
 def scrapeBoutScores(bout_id):
-    r = requests.get(url = CONFIG['spring']['rest']['SCRAPE_BOUT_SCORE'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], bout_id))
+    headers = requests.utils.default_headers()
+    headers['password'] = str(CONFIG['spring']['PW'])
+    r = requests.get(url = CONFIG['spring']['rest']['SCRAPE_BOUT_SCORE'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], bout_id), headers = headers)
     response = r.json()
     print("Add round scores to Bout %s completed wtih %s with %s rounds found and %s completed" % (bout_id, response['status'], response['itemsFound'], response['itemsCompleted']))
 
@@ -203,12 +231,16 @@ def refreshBout(bout_id):
             pass
 
 def addFightExpectedOutcomes(fight_id):
-    r = requests.get(url = CONFIG['spring']['rest']['ADD_FIGHT_EXP_OUTCOME'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], fight_id))
+    headers = requests.utils.default_headers()
+    headers['password'] = str(CONFIG['spring']['PW'])
+    r = requests.get(url = CONFIG['spring']['rest']['ADD_FIGHT_EXP_OUTCOME'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], fight_id), headers = headers)
     response = r.json() 
     print("Add bout expected outcomes to Fight %s completed wtih %s with %s rounds found and %s completed" % (fight_id, response['status'], response['itemsFound'], response['itemsCompleted']))
 
 def addFightOdds(fight_id):
-    r = requests.get(url = CONFIG['spring']['rest']['ADD_FIGHT_ODDS'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], fight_id))
+    headers = requests.utils.default_headers()
+    headers['password'] = str(CONFIG['spring']['PW'])
+    r = requests.get(url = CONFIG['spring']['rest']['ADD_FIGHT_ODDS'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], fight_id), headers = headers)
     response = r.json() 
     print("Add bout odds to Fight %s completed wtih %s with %s rounds found and %s completed" % (fight_id, response['status'], response['itemsFound'], response['itemsCompleted']))
 
@@ -220,7 +252,15 @@ def getAllFightIds():
 def addFightOddsUrl(fight_details):
     print("Please provide the bestFightOdds url for %s (%s)" % (fight_details['fightName'], fight_details['fightDate']))
     fight_url = input()
-    r = requests.get(url = CONFIG['spring']['rest']['ADD_FIGHT_ODDS_URL'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], fight_details['fightId'], fight_url.replace("https://www.bestfightodds.com/events/", "")))
+    headers = requests.utils.default_headers()
+    headers['password'] = str(CONFIG['spring']['PW'])
+    r = requests.get(url = CONFIG['spring']['rest']['ADD_FIGHT_ODDS_URL'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], fight_details['fightId'], fight_url.replace("https://www.bestfightodds.com/events/", "")), headers = headers)
     response = r.json()
     print("Add bestFightOdds (%s) to fight %s completed with %s" % (fight_url, fight_details['fightName'], response['status']))
  
+def updateRanking(payload):
+    headers = requests.utils.default_headers()
+    headers['password'] = str(CONFIG['spring']['PW'])
+    r = requests.post(url = CONFIG['spring']['rest']['UPDATE_RANKING'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT']), json = payload, headers = headers)
+    response = r.json() 
+    return response    

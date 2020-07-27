@@ -30,7 +30,7 @@ from utils.general import convAmericanOddsToImpPerc
 
 #addInfoToAllBouts("53278852bcd91e11")
 #
-#   fight_id = 'ddbd0d6259ce57cc'
+#   fight_id = 'dde70a112e053a6c'
 def add_new_bouts(fight_id):
     addBoutsToFutureFight(fight_id)
     fight_details = getBoutsFromFight(fight_id)

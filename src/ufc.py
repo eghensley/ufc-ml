@@ -10,11 +10,11 @@ from training import tune_ml, fill_ml_training_scores, optimize_bet, predict_bet
 from elo import optimize_elo, populate_elo
 from db import pop_future_bouts, pop_year_bouts, update_mybookie
 
-val_fights()
+#val_fights()
 #gen_score_report()
 #optimize_bet(trials = 5000)
 
-#pop_year_bouts()
+pop_year_bouts()
 
 
 
