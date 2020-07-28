@@ -264,3 +264,16 @@ def updateRanking(payload):
     r = requests.post(url = CONFIG['spring']['rest']['UPDATE_RANKING'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT']), json = payload, headers = headers)
     response = r.json() 
     return response    
+
+def getRankings(weight_class):
+    r = requests.get(url = CONFIG['spring']['rest']['GET_WC_RANKINGS'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], weight_class))
+    response = r.json() 
+    return response    
+
+def getEloCount(fighterOid):
+    r = requests.get(url = CONFIG['spring']['rest']['GET_ELO_COUNT'] % (CONFIG['spring']['HOST'], CONFIG['spring']['PORT'], fighterOid))
+    response = r.json() 
+    if response['errorMsg'] is not None:
+        print(response['errorMsg'])
+    return response['response']    
+    

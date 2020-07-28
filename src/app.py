@@ -32,6 +32,11 @@ def addFutureFightBouts(fightId):
     else:
         response = engine.populate_future_fight(fightId)
         return jsonify(response), response['statusCode']
+
+@app.route('/ufc/api/v1.0/rankings/<weightClass>', methods=['GET'])
+def getWeightClassRanks(weightClass):
+    response = engine.get_ranking_for_wc(weightClass)
+    return jsonify(response), response['statusCode']
     
 if __name__ == '__main__':
     engine = ufc_engine(CONFIG['spring']['PW'])

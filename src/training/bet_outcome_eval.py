@@ -296,6 +296,27 @@ class bet_eval:
 #            "14b9e0f2679a2205"]
 #import random
 #random.shuffle(fights)
+#
+#['fc9a9559a05f2704',
+# '33b2f68ef95252e0',
+# 'ddbd0d6259ce57cc',
+# '18f5669a92e99d92',
+# '5df17b3620145578',
+# '14b9e0f2679a2205',
+# 'c32eab6c2119e989',
+# '0b5b6876c2a4723f',
+# '53278852bcd91e11',
+# 'b26d3e3746fb4024',
+# 'dbd198f780286aca',
+# '4c12aa7ca246e7a4',
+# '1e13936d708bcff7',
+# '2eab7a6c8b0ed8cc',
+# '5f8e00c27b7e7410',
+# '0c1773639c795466',
+# '898337ef520fe4d3',
+# '44aa652b181bcf68',
+# 'dfb965c9824425db']
+
 
 def _opt_betting(trial):
     param = {
@@ -326,16 +347,18 @@ def _opt_betting(trial):
                       bet_female = param['bet_female']
                       )
     
-    return better.evaluate(fight_list = ['5f8e00c27b7e7410',
-                                         'dfb965c9824425db',
-                                         'c32eab6c2119e989',
-                                         '0c1773639c795466',
-                                         '898337ef520fe4d3',
+    return better.evaluate(fight_list = ['fc9a9559a05f2704',
+                                         '33b2f68ef95252e0',
                                          '18f5669a92e99d92',
-                                         'dbd198f780286aca',
                                          '5df17b3620145578',
-                                         'fc9a9559a05f2704',
-                                         '0b5b6876c2a4723f']
+                                         '14b9e0f2679a2205',
+                                         'c32eab6c2119e989',
+                                         '0b5b6876c2a4723f',
+                                         '53278852bcd91e11',
+                                         'b26d3e3746fb4024',
+                                         'dbd198f780286aca',
+                                         '4c12aa7ca246e7a4',
+                                         '1e13936d708bcff7']
                             )    
     
 def optimize_bet(clf = 'light', domain = 'strike', trials = 2000):
@@ -422,15 +445,12 @@ def gen_score_report():
                       bet_female = param['bet_female']
                               )
             res = better.evaluate(full_score = True, 
-                                  fight_list = [ '44aa652b181bcf68',
-                                                 '53278852bcd91e11',
-                                                 '1e13936d708bcff7',
-                                                 '33b2f68ef95252e0',
-                                                 'ddbd0d6259ce57cc',
-                                                 '2eab7a6c8b0ed8cc',
-                                                 'b26d3e3746fb4024',
-                                                 '14b9e0f2679a2205',
-                                                 '4c12aa7ca246e7a4'],
+                                  fight_list = [ '2eab7a6c8b0ed8cc',
+                                                 '5f8e00c27b7e7410',
+                                                 '0c1773639c795466',
+                                                 '898337ef520fe4d3',
+                                                 '44aa652b181bcf68',
+                                                 'dfb965c9824425db'],
                                     save_results = False,
                                     validate = True
                                     )  
@@ -604,7 +624,7 @@ def add_best_model():
     with open('predictors/bet/bettor_config.json', 'w') as w:
         json.dump(mod, w)
     
-#    fight_id = 'dde70a112e053a6c'
+#    fight_id = 'dde70a112e053a6c', 
 def predict_bet_winners(fight_id):
     with open('predictors/bet/bettor_config_new.json', 'r') as r:
         param = json.load(r)    

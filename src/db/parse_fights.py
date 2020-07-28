@@ -12,7 +12,8 @@ Created on Fri Dec 27 17:06:55 2019
     
 from spring import addRoundScore, getAllFightIds, getBoutsFromFight, addBoutScoreUrls, \
                          addBoutsToFight, addBoutDetails, addFightOddsUrl, refreshBout, \
-                         scrapeBoutScores, addFightOdds, addFightExpectedOutcomes, getTrainingFights
+                         scrapeBoutScores, addFightOdds, addFightExpectedOutcomes, \
+                         getTrainingFights
 from predictors import insert_new_ml_scores, insert_new_ml_prob
 from elo import populate_elo
 

@@ -12,18 +12,89 @@ from elo import optimize_elo, populate_elo
 from db import pop_future_bouts, pop_year_bouts, update_mybookie, addInfoToAllBouts
 from spring import addRoundScore, getAllFightIds, getBoutsFromFight, addBoutScoreUrls, \
                          addBoutsToFight, addBoutDetails, addFightOddsUrl, refreshBout, \
-                         scrapeBoutScores, addFightOdds, addFightExpectedOutcomes, addBoutsToFutureFight
-from datetime import datetime
+                         scrapeBoutScores, addFightOdds, addFightExpectedOutcomes, \
+                         addBoutsToFutureFight, getRankings, getLastEloCount, getEloCount
+import datetime
+from scipy.stats import percentileofscore
+import numpy as np
+import pandas as pd
 
 standard_response = {'status': 'Ok', 'errorMsg': None, 'itemsFound': 1, 'itemsCompleted': 1, 'statusCode': 200}
 fail_response = {'status': 'Internal Server Error', 'errorMsg': None, 'itemsFound': 1, 'itemsCompleted': 0, 'statusCode': 400}
+standard_get_response = {'status': 'Ok', 'errorMsg': None, 'itemsFound': 1, 'itemsCompleted': 1, 'statusCode': 200, 'response': None}
 
+NOW = datetime.datetime.now()
+D = datetime.timedelta(days = (365 * 2))
+#wc='LW'
+def calc_rankings_for_wc(wc):
+    rankings = getRankings(wc)['response']
+    
+    fighters = {}
+    wc_stat_univ = {}
+    
+    tot_rank_univ = []
+    
+    stat_cols = ['offStrikeEloPost',
+                'defStrikeEloPost',
+                'offGrapplingEloPost',
+                'defGrapplingEloPost'
+                ]
+    
+    for stat_name in stat_cols:
+        wc_stat_univ[stat_name] = []
+        
+    for rank in rankings:
+        rank_date = datetime.datetime.strptime(rank['fightDate'].split('.')[0], '%Y-%m-%dT%H:%M:%S')
+        
+        if (rank['fighterBoutXRef']['expOdds'] is not None and NOW - D < rank_date and getEloCount(rank['fighter']['oid']) > 5):
+            fighters[rank['fighterBoutXRef']['fighter']['oid']] = {i:None for i in stat_cols}
+            fighters[rank['fighterBoutXRef']['fighter']['oid']]['name'] = rank['fighterBoutXRef']['fighter']['fighterName']
+            fighters[rank['fighterBoutXRef']['fighter']['oid']]['total'] = None
+        for stat in stat_cols:
+                wc_stat_univ[stat].append(rank['fighterBoutXRef'][stat])
+                
+    for f_rank in rankings:
+        f_rank_date = datetime.datetime.strptime(f_rank['fightDate'].split('.')[0], '%Y-%m-%dT%H:%M:%S')
 
+        if (f_rank['fighterBoutXRef']['expOdds'] is not None and NOW - D < f_rank_date and getEloCount(f_rank['fighter']['oid']) > 5):
+            for f_stat in stat_cols:        
+                fighters[f_rank['fighterBoutXRef']['fighter']['oid']][f_stat] = percentileofscore(wc_stat_univ[f_stat], f_rank['fighterBoutXRef'][f_stat], 'rank')
+        
+    for f_vals in fighters.values():
+        tot_rank_univ.append(np.sum([f_vals[i] for i in stat_cols]))
+    
+    for f_id, f_val in fighters.items():
+        f_val['total'] = percentileofscore(tot_rank_univ, np.sum([f_val[i] for i in stat_cols]), 'rank')
+    
+    f_df = pd.DataFrame.from_dict(fighters).T
+    f_df.sort_values('total', ascending = False, inplace = True)
+    f_df.reset_index(inplace = True)
+    f_df = f_df.loc[0:19]
+    
+    response = []
+    for row in f_df.values:
+        response.append({'oid': row[0], 'name': row[3], 'total': row[6], 'defGrapp': row[1], 'defStrike': row[2], 'offGrapp': row[4], 'offStrike': row[5]})
+    return response
 
 class ufc_engine:
     
     def __init__(self, pw):
         self.pw = pw
+        self.weight_class_rankings = {}
+        self.weight_classes = ['WW',
+                                'FW',
+                                'WSW',
+                                'WFW',
+                                'BW',
+                                'WBW',
+                                'FFW',
+                                'WFFW',
+                                'LW',
+                                'MW',
+                                'LHW',
+                                'HW']
+        for wc in self.weight_classes:
+            self.weight_class_rankings[wc] = calc_rankings_for_wc(wc)
         
     def authenticate(self, headers):
         if 'Password' in headers:
@@ -54,7 +125,24 @@ class ufc_engine:
             print('Request failed with %s' % (e))
             resp = deepcopy(fail_response)
             resp['errorMsg'] = e
-            return resp        
+            return resp 
+    
+    def get_ranking_for_wc(self, wc):
+        try:
+            if (wc.upper() in self.weight_classes):
+                resp = deepcopy(standard_get_response)
+                resp['response'] = self.weight_class_rankings[wc.upper()]
+                return resp
+            else:
+                resp = deepcopy(fail_response)
+                resp['errorMsg'] = '%s is not a supported weight class' % (wc)
+                return resp 
+        except Exception as e:
+            print('Request failed with %s' % (e))
+            resp = deepcopy(fail_response)
+            resp['errorMsg'] = e
+            return resp 
+            
         
 
 #model = ufc_engine()
