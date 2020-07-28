@@ -69,7 +69,7 @@ class bet_eval:
         self._bout_info = None
 
     def _wager_funct(self, conf_diff, f1_num, f2_num):
-        bet_mult = self.bet_intercept + (self.conf_diff_lin * conf_diff) + (self.conf_diff_quad * (conf_diff**2)) + (self.num_fight_lin * f1_num) + (self.num_fight_quad * (f1_num**2)) + (self.num_fight_lin * f2_num) + (self.num_fight_quad * (f2_num**2))
+        bet_mult = self.bet_intercept + (self.conf_diff_lin * conf_diff) + (self.conf_diff_quad * (conf_diff**2)) + (self.num_fight_lin * f1_num) + (self.num_fight_quad * (f1_num**2)) + (self.num_fight_lin * f2_num) + (self.num_fight_quad * (f2_num**2)) + (self.f1_num * self.num_fight_lin) + ((self.f1_num**2) * self.num_fight_quad) + (self.f2_num * self.num_fight_lin) + ((self.f2_num**2) * self.num_fight_quad)
         to_wager = bet_mult * self.standard_wager
 #        print("%s + (%s * %s) + (%s * (%s**2)) + (%s * %s) + (%s * (%s**2)) + (%s * %s) + (%s * (%s**2)))" % (self.bet_intercept, self.conf_diff_lin, conf_diff, self.conf_diff_quad, conf_diff, self.num_fight_lin, f1_num, self.num_fight_quad, f1_num, self.num_fight_lin, f2_num, self.num_fight_quad, f2_num))
 #        print("$%s" % (to_wager))
@@ -299,24 +299,24 @@ class bet_eval:
 
 def _opt_betting(trial):
     param = {
-    'prev_fight_floor': trial.suggest_int('prev_fight_floor', 3, 10),
+    'bet_female': trial.suggest_categorical('bet_female', [True, False]),
+    'prev_fight_floor': trial.suggest_int('prev_fight_floor', 3, 7),
     'diff_floor': trial.suggest_loguniform('diff_floor', 1e-4, 1e-1),
 #    'prev_fight_ceiling': trial.suggest_int('prev_fight_ceiling', 1, 15),
     'diff_ceiling': trial.suggest_loguniform('diff_ceiling', 1e-1, 0.3),
     'bet_intercept': trial.suggest_uniform('bet_intercept', -0.5, 0.5),
-    'conf_diff_lin': trial.suggest_uniform('conf_diff_lin', 0, 0.5),
-#    'num_fight_lin': trial.suggest_uniform('num_fight_lin', 0, 0.5),
-    'conf_diff_quad': trial.suggest_uniform('conf_diff_quad', -0.5, 0.5),
-#    'num_fight_quad': trial.suggest_uniform('num_fight_quad', -0.5, 0.5),
+    'conf_diff_lin': trial.suggest_uniform('conf_diff_lin', -0.25, 0.5),
+    'num_fight_lin': trial.suggest_uniform('num_fight_lin', -0.25, 0.5),
+    'conf_diff_quad': trial.suggest_uniform('conf_diff_quad', -0.25, 0.5),
+    'num_fight_quad': trial.suggest_uniform('num_fight_quad', -0.25, 0.5),
     'bet_ceiling': trial.suggest_int('bet_ceiling', 10, 200),
-    'bet_female': trial.suggest_categorical('bet_female', [True, False])
     }
     
     better = bet_eval(debug = False,
                       conf_diff_lin = param['conf_diff_lin'],
                       conf_diff_quad = param['conf_diff_quad'],
-                      num_fight_lin = 0, #param['num_fight_lin'],
-                      num_fight_quad = 0, #param['num_fight_quad'],
+                      num_fight_lin = param['num_fight_lin'],
+                      num_fight_quad = param['num_fight_quad'],
                       bet_intercept = param['bet_intercept'],
 #                      prev_fight_ceiling = param['prev_fight_ceiling'],
                       prev_fight_floor = param['prev_fight_floor'],
