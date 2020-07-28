@@ -275,7 +275,28 @@ class bet_eval:
             self._proc_bout(bout_detail['boutId'])      
         return self._predictions
         
-        
+#fights =   ['fc9a9559a05f2704',
+#            '33b2f68ef95252e0',
+#            '5df17b3620145578',
+#            'b26d3e3746fb4024',
+#            '44aa652b181bcf68',
+#            '0c1773639c795466',
+#            "dfb965c9824425db",
+#            "5f8e00c27b7e7410",
+#            "898337ef520fe4d3",
+#            "53278852bcd91e11",
+#            "0b5b6876c2a4723f",
+#            "ddbd0d6259ce57cc",
+#            "18f5669a92e99d92",
+#            "dbd198f780286aca",
+#            "c32eab6c2119e989",
+#            "2eab7a6c8b0ed8cc",
+#            "1e13936d708bcff7",
+#            "4c12aa7ca246e7a4",
+#            "14b9e0f2679a2205"]
+#import random
+#random.shuffle(fights)
+
 def _opt_betting(trial):
     param = {
     'prev_fight_floor': trial.suggest_int('prev_fight_floor', 3, 10),
@@ -305,12 +326,16 @@ def _opt_betting(trial):
                       bet_female = param['bet_female']
                       )
     
-    return better.evaluate(fight_list = ["fc9a9559a05f2704",
-                                    "33b2f68ef95252e0",
-                                    "5df17b3620145578",
-                                    "b26d3e3746fb4024",
-                                    "44aa652b181bcf68",
-                                    "0c1773639c795466"]
+    return better.evaluate(fight_list = ['5f8e00c27b7e7410',
+                                         'dfb965c9824425db',
+                                         'c32eab6c2119e989',
+                                         '0c1773639c795466',
+                                         '898337ef520fe4d3',
+                                         '18f5669a92e99d92',
+                                         'dbd198f780286aca',
+                                         '5df17b3620145578',
+                                         'fc9a9559a05f2704',
+                                         '0b5b6876c2a4723f']
                             )    
     
 def optimize_bet(clf = 'light', domain = 'strike', trials = 2000):
@@ -397,14 +422,15 @@ def gen_score_report():
                       bet_female = param['bet_female']
                               )
             res = better.evaluate(full_score = True, 
-                                  fight_list = ["1e13936d708bcff7",
-                                                "4c12aa7ca246e7a4",
-                                                "14b9e0f2679a2205",
-                                                "dfb965c9824425db",
-                                                "5f8e00c27b7e7410",
-                                                "898337ef520fe4d3",
-                                                "53278852bcd91e11",
-                                                "0b5b6876c2a4723f"],
+                                  fight_list = [ '44aa652b181bcf68',
+                                                 '53278852bcd91e11',
+                                                 '1e13936d708bcff7',
+                                                 '33b2f68ef95252e0',
+                                                 'ddbd0d6259ce57cc',
+                                                 '2eab7a6c8b0ed8cc',
+                                                 'b26d3e3746fb4024',
+                                                 '14b9e0f2679a2205',
+                                                 '4c12aa7ca246e7a4'],
                                     save_results = False,
                                     validate = True
                                     )  
@@ -493,9 +519,6 @@ def val_fights():
         results[file] = res
     with open('new_validation_results.json', 'w') as b:
         json.dump(results, b)    
-        
-    
-    
 
 
 def validate_new_fights():
@@ -515,9 +538,15 @@ def validate_new_fights():
                       bet_female = param['bet_female']
                       )      
     res = bettor.evaluate(full_score = True, 
-                          fight_list = ["dbd198f780286aca",
+                          fight_list = ["dde70a112e053a6c",
+                                        "ddbd0d6259ce57cc",
+                                        "18f5669a92e99d92",
+                                        "dbd198f780286aca",
                                         "c32eab6c2119e989",
-                                        "2eab7a6c8b0ed8cc"
+                                        "2eab7a6c8b0ed8cc",
+                                        "1e13936d708bcff7",
+                                        "4c12aa7ca246e7a4",
+                                        "14b9e0f2679a2205"
                                         ],
                             save_results = False,
                             validate = True
@@ -527,15 +556,15 @@ def validate_new_fights():
 
 #    FINAL: 19 bouts bet on
 #    {'model_id': '09c03503-f97d-4828-bd91-e02178ff041c', 'average': -25.564903527386413, 'gross': -485.73316702034185}
-    res = bettor.evaluate(full_score = True, 
-                          fight_list = ["dfb965c9824425db",
-                                        "5f8e00c27b7e7410",
-                                        "898337ef520fe4d3",
-                                        "53278852bcd91e11",
-                                        "0b5b6876c2a4723f"],
-                            save_results = False,
-                            validate = True
-                            )  
+#    res = bettor.evaluate(full_score = True, 
+#                          fight_list = ["dfb965c9824425db",
+#                                        "5f8e00c27b7e7410",
+#                                        "898337ef520fe4d3",
+#                                        "53278852bcd91e11",
+#                                        "0b5b6876c2a4723f"],
+#                            save_results = False,
+#                            validate = True
+#                            )  
 #    FINAL: 18 bouts bet on
 #    {'model_id': 'b940c641-91a8-4026-ab86-0d58ff0c9bf5', 'average': -4.852955869906466, 'gross': -87.35320565831638}
 
@@ -545,17 +574,17 @@ def validate_new_fights():
 #   FINAL: 20 bouts bet on
 #   {'model_id': 'b1d20286-05bc-494c-9098-b4f22c7d838f', 'average': 12.336904823309654, 'gross': 246.73809646619307}
 
-    res = bettor.evaluate(full_score = True, 
-                          fight_list = ['fc9a9559a05f2704',
-                                        '33b2f68ef95252e0',
-                                        '5df17b3620145578',
-                                        'b26d3e3746fb4024',
-                                        '44aa652b181bcf68',
-                                        '0c1773639c795466'],
-                            save_results = False,
-                            validate = True
-                            )  
-    
+#    res = bettor.evaluate(full_score = True, 
+#                          fight_list = ['fc9a9559a05f2704',
+#                                        '33b2f68ef95252e0',
+#                                        '5df17b3620145578',
+#                                        'b26d3e3746fb4024',
+#                                        '44aa652b181bcf68',
+#                                        '0c1773639c795466'],
+#                            save_results = False,
+#                            validate = True
+#                            )  
+#    
 #    FINAL: 14 bouts bet on
 #    {'model_id': 'f9ad41a2-bf01-4889-a49b-99b895ce0080', 'average': 31.866347217970617, 'gross': 446.1288610515886}
 #    FINAL: 14 bouts bet on

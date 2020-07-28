@@ -11,10 +11,10 @@ from elo import optimize_elo, populate_elo
 from db import pop_future_bouts, pop_year_bouts, update_mybookie
 
 #val_fights()
-#gen_score_report()
-#optimize_bet(trials = 5000)
+optimize_bet(trials = 2000)
+gen_score_report()
 
-pop_year_bouts()
+#pop_year_bouts()
 
 
 
