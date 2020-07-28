@@ -17,7 +17,5 @@ src/elo/scores/
 
 src/spring/config/
 
-src/_ufc_.py
-src/app.py
 src/templates/
 src/spring/config/_config_.py
