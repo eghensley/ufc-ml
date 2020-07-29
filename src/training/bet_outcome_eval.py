@@ -275,47 +275,41 @@ class bet_eval:
             self._proc_bout(bout_detail['boutId'])      
         return self._predictions
         
-#fights =   ['fc9a9559a05f2704',
-#            '33b2f68ef95252e0',
-#            '5df17b3620145578',
-#            'b26d3e3746fb4024',
-#            '44aa652b181bcf68',
-#            '0c1773639c795466',
-#            "dfb965c9824425db",
-#            "5f8e00c27b7e7410",
-#            "898337ef520fe4d3",
-#            "53278852bcd91e11",
-#            "0b5b6876c2a4723f",
-#            "ddbd0d6259ce57cc",
-#            "18f5669a92e99d92",
-#            "dbd198f780286aca",
-#            "c32eab6c2119e989",
-#            "2eab7a6c8b0ed8cc",
-#            "1e13936d708bcff7",
-#            "4c12aa7ca246e7a4",
-#            "14b9e0f2679a2205"]
-#import random
-#random.shuffle(fights)
-#
-#['fc9a9559a05f2704',
-# '33b2f68ef95252e0',
-# 'ddbd0d6259ce57cc',
-# '18f5669a92e99d92',
-# '5df17b3620145578',
-# '14b9e0f2679a2205',
-# 'c32eab6c2119e989',
-# '0b5b6876c2a4723f',
-# '53278852bcd91e11',
-# 'b26d3e3746fb4024',
-# 'dbd198f780286aca',
-# '4c12aa7ca246e7a4',
-# '1e13936d708bcff7',
-# '2eab7a6c8b0ed8cc',
-# '5f8e00c27b7e7410',
-# '0c1773639c795466',
-# '898337ef520fe4d3',
-# '44aa652b181bcf68',
-# 'dfb965c9824425db']
+fights =   ['fc9a9559a05f2704',
+            '33b2f68ef95252e0',
+            '5df17b3620145578',
+            'b26d3e3746fb4024',
+            '44aa652b181bcf68',
+            '0c1773639c795466',
+            "dfb965c9824425db",
+            "5f8e00c27b7e7410",
+            "898337ef520fe4d3",
+            "53278852bcd91e11",
+            "0b5b6876c2a4723f",
+            "c32eab6c2119e989",
+            "2eab7a6c8b0ed8cc",
+            "1e13936d708bcff7",
+            "4c12aa7ca246e7a4",
+            "14b9e0f2679a2205"]
+import random
+random.shuffle(fights)
+
+['c32eab6c2119e989',
+ '0b5b6876c2a4723f',
+ '1e13936d708bcff7',
+ '2eab7a6c8b0ed8cc',
+ '5df17b3620145578',
+ '44aa652b181bcf68',
+ '5f8e00c27b7e7410',
+ '898337ef520fe4d3',
+ '53278852bcd91e11',
+ '4c12aa7ca246e7a4',
+ '14b9e0f2679a2205',
+ 'fc9a9559a05f2704',
+ '0c1773639c795466',
+ 'b26d3e3746fb4024',
+ '33b2f68ef95252e0',
+ 'dfb965c9824425db']
 
 
 def _opt_betting(trial):
@@ -347,18 +341,14 @@ def _opt_betting(trial):
                       bet_female = param['bet_female']
                       )
     
-    return better.evaluate(fight_list = ['fc9a9559a05f2704',
-                                         '33b2f68ef95252e0',
-                                         '18f5669a92e99d92',
-                                         '5df17b3620145578',
-                                         '14b9e0f2679a2205',
-                                         'c32eab6c2119e989',
+    return better.evaluate(fight_list = ['c32eab6c2119e989',
                                          '0b5b6876c2a4723f',
-                                         '53278852bcd91e11',
-                                         'b26d3e3746fb4024',
-                                         'dbd198f780286aca',
-                                         '4c12aa7ca246e7a4',
-                                         '1e13936d708bcff7']
+                                         '1e13936d708bcff7',
+                                         '2eab7a6c8b0ed8cc',
+                                         '5df17b3620145578',
+                                         '44aa652b181bcf68',
+                                         '5f8e00c27b7e7410',
+                                         '898337ef520fe4d3']
                             )    
     
 def optimize_bet(clf = 'light', domain = 'strike', trials = 2000):
@@ -445,11 +435,13 @@ def gen_score_report():
                       bet_female = param['bet_female']
                               )
             res = better.evaluate(full_score = True, 
-                                  fight_list = [ '2eab7a6c8b0ed8cc',
-                                                 '5f8e00c27b7e7410',
+                                  fight_list = ['53278852bcd91e11',
+                                                 '4c12aa7ca246e7a4',
+                                                 '14b9e0f2679a2205',
+                                                 'fc9a9559a05f2704',
                                                  '0c1773639c795466',
-                                                 '898337ef520fe4d3',
-                                                 '44aa652b181bcf68',
+                                                 'b26d3e3746fb4024',
+                                                 '33b2f68ef95252e0',
                                                  'dfb965c9824425db'],
                                     save_results = False,
                                     validate = True
