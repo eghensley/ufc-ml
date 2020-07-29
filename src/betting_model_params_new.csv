@@ -1,1 +1,2 @@
-""
+,average,average_rank,bet_ceiling,bet_female,bet_intercept,conf_diff_lin,conf_diff_quad,diff_ceiling,diff_floor,gross,gross_rank,model_id,num_fight_lin,num_fight_quad,prev_fight_ceiling,prev_fight_floor,standard_wager,tot_val_rank,total_rank,val_average,val_average_rank,val_gross,val_gross_rank
+ac9c77c2-56c6-4cc0-9bfe-94a82191e0ac,13.706644905592052,3.2,196,False,0.03308837680233998,-0.24393303241107384,0.38866983418747114,0.2970525720142855,0.006080035199366736,424.9059920733536,11.35,ac9c77c2-56c6-4cc0-9bfe-94a82191e0ac,0.19523156706596076,0.013916302224717597,99,4,1,200.0,14.55,6.573226878957001,100.0,177.47712573183904,100.0
