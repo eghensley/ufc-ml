@@ -37,6 +37,15 @@ def addFutureFightBouts(fightId):
 def getWeightClassRanks(weightClass):
     response = engine.get_ranking_for_wc(weightClass)
     return jsonify(response), response['statusCode']
+
+@app.route('/ufc/api/v1.0/populate/ml/<boutId>', methods=['GET'])
+def addMlOddsToBout(boutId):
+    if not engine.authenticate(request.headers):
+        return jsonify(failed_login_response), 404
+    else:
+        response = engine.addMlProb(boutId)
+        return jsonify(response), response['statusCode']
+    
     
 if __name__ == '__main__':
     engine = ufc_engine(CONFIG['spring']['PW'])

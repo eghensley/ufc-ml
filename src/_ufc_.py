@@ -14,6 +14,8 @@ from spring import addRoundScore, getAllFightIds, getBoutsFromFight, addBoutScor
                          addBoutsToFight, addBoutDetails, addFightOddsUrl, refreshBout, \
                          scrapeBoutScores, addFightOdds, addFightExpectedOutcomes, \
                          addBoutsToFutureFight, getRankings, getLastEloCount, getEloCount
+from predictors import insert_new_ml_scores, insert_new_ml_prob
+
 import datetime
 from scipy.stats import percentileofscore
 import numpy as np
@@ -142,6 +144,16 @@ class ufc_engine:
             resp = deepcopy(fail_response)
             resp['errorMsg'] = e
             return resp 
+        
+    def addMlProb(self, boutId):
+        try:
+            insert_new_ml_prob(boutId)
+            return standard_response
+        except Exception as e:
+            print('Request failed with %s' % (e))
+            resp = deepcopy(fail_response)
+            resp['errorMsg'] = e
+            return resp         
             
         
 

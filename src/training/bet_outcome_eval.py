@@ -141,6 +141,7 @@ class bet_eval:
                 if self.debug:
                     print('skipping bout due to filter constraints')
                 return
+
             if self.score:
                 bet_result = 0
             else:
@@ -550,15 +551,11 @@ def validate_new_fights():
                       bet_female = param['bet_female']
                       )      
     res = bettor.evaluate(full_score = True, 
-                          fight_list = ["dde70a112e053a6c",
-                                        "ddbd0d6259ce57cc",
-                                        "18f5669a92e99d92",
-                                        "dbd198f780286aca",
-                                        "c32eab6c2119e989",
-                                        "2eab7a6c8b0ed8cc",
-                                        "1e13936d708bcff7",
-                                        "4c12aa7ca246e7a4",
-                                        "14b9e0f2679a2205"
+                          fight_list = [
+#                                          "dde70a112e053a6c",
+#                                        "ddbd0d6259ce57cc",
+#                                        "18f5669a92e99d92",
+                                        "dbd198f780286aca"
                                         ],
                             save_results = False,
                             validate = True
@@ -616,7 +613,7 @@ def add_best_model():
     with open('predictors/bet/bettor_config.json', 'w') as w:
         json.dump(mod, w)
     
-#    fight_id = 'dde70a112e053a6c', 
+#    fight_id = '3746e21bb508391a'
 def predict_bet_winners(fight_id):
     with open('predictors/bet/bettor_config_new.json', 'r') as r:
         param = json.load(r)    
