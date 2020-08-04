@@ -49,4 +49,4 @@ def addMlOddsToBout(boutId):
     
 if __name__ == '__main__':
     engine = ufc_engine(CONFIG['spring']['PW'])
-    app.run(port=CONFIG['flask']['PORT'])
+    app.run(port=int(CONFIG['flask']['PORT']), host='0.0.0.0')

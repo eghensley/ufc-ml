@@ -5,16 +5,26 @@ Created on Thu Jun 18 12:11:19 2020
 
 @author: eric.hensleyibm.com
 """
+import argparse
+import os
+
+parser = argparse.ArgumentParser(description='UFC Prediction Engine')
+parser.add_argument('--fport', type=int,
+                    help='Flask Port')
+parser.add_argument('--spw', type=str,
+                    help='Spring Password')
+parser.add_argument('--shost', type=str,
+                    help='Spring Host')
+args = parser.parse_args()
+
+os.environ['ufc.flask.spring.host'] = str(args.shost)
+os.environ['ufc.flask.flask.port'] = str(args.fport)
+os.environ['ufc.flask.spring.pw'] = str(args.spw)
 
 from copy import deepcopy
-from training import tune_ml, fill_ml_training_scores, optimize_bet, predict_bet_winners
-from elo import optimize_elo, populate_elo
-from db import pop_future_bouts, pop_year_bouts, update_mybookie, addInfoToAllBouts
-from spring import addRoundScore, getAllFightIds, getBoutsFromFight, addBoutScoreUrls, \
-                         addBoutsToFight, addBoutDetails, addFightOddsUrl, refreshBout, \
-                         scrapeBoutScores, addFightOdds, addFightExpectedOutcomes, \
-                         addBoutsToFutureFight, getRankings, getLastEloCount, getEloCount
-from predictors import insert_new_ml_scores, insert_new_ml_prob
+from db import addInfoToAllBouts
+from spring import getRankings, getEloCount, addBoutsToFutureFight
+from predictors import insert_new_ml_prob
 
 import datetime
 from scipy.stats import percentileofscore
