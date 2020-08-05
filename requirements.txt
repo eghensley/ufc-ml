@@ -65,7 +65,6 @@ MarkupSafe==1.0
 mccabe==0.6.1
 mistune==0.8.3
 mock==2.0.0
-mpi4py==3.0.0
 mpmath==1.0.0
 nbconvert==5.2.1
 nbformat==4.4.0
