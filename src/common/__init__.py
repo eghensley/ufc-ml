@@ -10,4 +10,3 @@ import json
 
 with open("./src/common/raw_feature_universe.json", "r") as f:
     raw_features = json.load(f)
-    print(raw_features)

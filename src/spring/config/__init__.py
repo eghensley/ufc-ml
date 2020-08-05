@@ -49,3 +49,5 @@ CONFIG = {'spring': {'HOST': os.getenv('ufc.flask.spring.host'),
 
 if (CONFIG['flask']['PORT'] is None):
     CONFIG['flask']['PORT'] = 8080
+    
+print(CONFIG)
