@@ -142,7 +142,6 @@ service-identity==18.1.0
 simplegeneric==0.8.1
 six==1.11.0
 sklearn==0.0
-SMP==0.1.4
 snowballstemmer==1.2.1
 soupsieve==1.8
 Sphinx==1.8.4
