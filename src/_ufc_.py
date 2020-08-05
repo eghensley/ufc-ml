@@ -17,9 +17,12 @@ parser.add_argument('--shost', type=str,
                     help='Spring Host')
 args = parser.parse_args()
 
-os.environ['ufc.flask.spring.host'] = str(args.shost)
-os.environ['ufc.flask.flask.port'] = str(args.fport)
-os.environ['ufc.flask.spring.pw'] = str(args.spw)
+if (str(args.shost) != 'None'):
+    os.environ['ufc.flask.spring.host'] = str(args.shost)
+if (str(args.fport) != 'None'):
+    os.environ['ufc.flask.flask.port'] = str(args.fport)
+if (str(args.spw) != 'None'):
+    os.environ['ufc.flask.spring.pw'] = str(args.spw)
 
 print(os.environ)
 
