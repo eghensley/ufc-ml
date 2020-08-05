@@ -21,6 +21,8 @@ os.environ['ufc.flask.spring.host'] = str(args.shost)
 os.environ['ufc.flask.flask.port'] = str(args.fport)
 os.environ['ufc.flask.spring.pw'] = str(args.spw)
 
+print(os.environ)
+
 from copy import deepcopy
 from db import addInfoToAllBouts
 from spring import getRankings, getEloCount, addBoutsToFutureFight
