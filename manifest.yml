@@ -1,6 +1,6 @@
 applications:
  - name: ufc-ml-api-flask
    buildpack: https://github.com/cloudfoundry/python-buildpack.git
-   random-route: true
+   random-route: false
    memory: 1536M
    disk_quota: 2048M
