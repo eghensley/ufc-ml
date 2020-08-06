@@ -122,10 +122,10 @@ class ufc_engine:
                                 'MW',
                                 'LHW',
                                 'HW']
-        for wc in self.weight_classes:
-            print('initializing %s' % (wc))
-            self.weight_class_rankings[wc] = calc_rankings_for_wc(wc)
-            print('initialized %s' % (wc))
+#        for wc in self.weight_classes:
+#            print('initializing %s' % (wc))
+#            self.weight_class_rankings[wc] = calc_rankings_for_wc(wc)
+#            print('initialized %s' % (wc))
         
     def authenticate(self, headers):
         if 'Password' in headers:
