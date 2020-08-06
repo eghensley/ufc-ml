@@ -46,7 +46,7 @@ D = datetime.timedelta(days = (365 * 2))
 def calc_rankings_for_wc(wc):
     rankings = getRankings(wc)['response']
     
-    print(rankings)
+    print('pulled %s rankings' % (wc))
     fighters = {}
     wc_stat_univ = {}
     
@@ -70,7 +70,8 @@ def calc_rankings_for_wc(wc):
             fighters[rank['fighterBoutXRef']['fighter']['oid']]['total'] = None
         for stat in stat_cols:
                 wc_stat_univ[stat].append(rank['fighterBoutXRef'][stat])
-                
+    
+    print('  -- cleared rank init step 1')
     for f_rank in rankings:
         f_rank_date = datetime.datetime.strptime(f_rank['fightDate'].split('.')[0], '%Y-%m-%dT%H:%M:%S')
 
@@ -78,20 +79,30 @@ def calc_rankings_for_wc(wc):
             for f_stat in stat_cols:        
                 fighters[f_rank['fighterBoutXRef']['fighter']['oid']][f_stat] = percentileofscore(wc_stat_univ[f_stat], f_rank['fighterBoutXRef'][f_stat], 'rank')
         
+    print('  -- cleared rank init step 2')
+
     for f_vals in fighters.values():
         tot_rank_univ.append(np.sum([f_vals[i] for i in stat_cols]))
     
+    print('  -- cleared rank init step 3')
+
     for f_id, f_val in fighters.items():
         f_val['total'] = percentileofscore(tot_rank_univ, np.sum([f_val[i] for i in stat_cols]), 'rank')
     
+    print('  -- cleared rank init step 4')
+
     f_df = pd.DataFrame.from_dict(fighters).T
     f_df.sort_values('total', ascending = False, inplace = True)
     f_df.reset_index(inplace = True)
     f_df = f_df.loc[0:19]
     
+    print('  -- cleared rank init step 5')
+
     response = []
     for row in f_df.values:
         response.append({'oid': row[0], 'name': row[3], 'total': row[6], 'defGrapp': row[1], 'defStrike': row[2], 'offGrapp': row[4], 'offStrike': row[5]})
+    print('  -- cleared rank init step 6; final.')
+
     return response
 
 class ufc_engine:
