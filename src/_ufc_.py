@@ -24,14 +24,14 @@ if (str(args.fport) != 'None'):
 if (str(args.spw) != 'None'):
     os.environ['ufc.flask.spring.pw'] = str(args.spw)
 
-print(os.environ)
+#os.environ['ufc.flask.spring.host'] = 'http://localhost:4646'
+#print(os.environ)
 
 from copy import deepcopy
 from db import addInfoToAllBouts
-from spring import getRankings, getEloCount, addBoutsToFutureFight
+from spring import getRankings, addBoutsToFutureFight
 from predictors import insert_new_ml_prob
 
-import datetime
 from scipy.stats import percentileofscore
 import numpy as np
 import pandas as pd
@@ -40,9 +40,7 @@ standard_response = {'status': 'Ok', 'errorMsg': None, 'itemsFound': 1, 'itemsCo
 fail_response = {'status': 'Internal Server Error', 'errorMsg': None, 'itemsFound': 1, 'itemsCompleted': 0, 'statusCode': 400}
 standard_get_response = {'status': 'Ok', 'errorMsg': None, 'itemsFound': 1, 'itemsCompleted': 1, 'statusCode': 200, 'response': None}
 
-NOW = datetime.datetime.now()
-D = datetime.timedelta(days = (365 * 2))
-#wc='LW'
+#wc='WFFW'
 def calc_rankings_for_wc(wc):
     rankings = getRankings(wc)['response']
     
@@ -62,23 +60,17 @@ def calc_rankings_for_wc(wc):
         wc_stat_univ[stat_name] = []
         
     for rank in rankings:
-        rank_date = datetime.datetime.strptime(rank['fightDate'].split('.')[0], '%Y-%m-%dT%H:%M:%S')
-        
-        if (rank['fighterBoutXRef']['expOdds'] is not None and NOW - D < rank_date and getEloCount(rank['fighter']['oid']) > 5):
-            fighters[rank['fighterBoutXRef']['fighter']['oid']] = {i:None for i in stat_cols}
-            fighters[rank['fighterBoutXRef']['fighter']['oid']]['name'] = rank['fighterBoutXRef']['fighter']['fighterName']
-            fighters[rank['fighterBoutXRef']['fighter']['oid']]['total'] = None
+        fighters[rank['fighterOid']] = {i:None for i in stat_cols}
+        fighters[rank['fighterOid']]['name'] = rank['fighterName']
+        fighters[rank['fighterOid']]['total'] = None
         for stat in stat_cols:
-                wc_stat_univ[stat].append(rank['fighterBoutXRef'][stat])
+                wc_stat_univ[stat].append(rank[stat])
     
     print('  -- cleared rank init step 1')
     for f_rank in rankings:
-        f_rank_date = datetime.datetime.strptime(f_rank['fightDate'].split('.')[0], '%Y-%m-%dT%H:%M:%S')
-
-        if (f_rank['fighterBoutXRef']['expOdds'] is not None and NOW - D < f_rank_date and getEloCount(f_rank['fighter']['oid']) > 5):
-            for f_stat in stat_cols:        
-                fighters[f_rank['fighterBoutXRef']['fighter']['oid']][f_stat] = percentileofscore(wc_stat_univ[f_stat], f_rank['fighterBoutXRef'][f_stat], 'rank')
-        
+        for f_stat in stat_cols:        
+            fighters[f_rank['fighterOid']][f_stat] = percentileofscore(wc_stat_univ[f_stat], f_rank[f_stat], 'rank')
+    
     print('  -- cleared rank init step 2')
 
     for f_vals in fighters.values():
@@ -122,10 +114,10 @@ class ufc_engine:
                                 'MW',
                                 'LHW',
                                 'HW']
-#        for wc in self.weight_classes:
-#            print('initializing %s' % (wc))
-#            self.weight_class_rankings[wc] = calc_rankings_for_wc(wc)
-#            print('initialized %s' % (wc))
+        for wc in self.weight_classes:
+            print('initializing %s' % (wc))
+            self.weight_class_rankings[wc] = calc_rankings_for_wc(wc)
+            print('initialized %s' % (wc))
         
     def authenticate(self, headers):
         if 'Password' in headers:

@@ -43,7 +43,7 @@ CONFIG = {'spring': {'HOST': os.getenv('ufc.flask.spring.host'),
    'ADD_FUT_BOUT_SUMMARY': '%s/ufc/rest/bout/future/summary/add',
    'ADD_MY_BOOKIE_ODDS': '%s/ufc/scores/odds/myBookie/add',
    'UPDATE_RANKING': '%s/ufc/ranks/update',
-   'GET_WC_RANKINGS': '%s/ufc/ranks/weightClass/%s',
+   'GET_WC_RANKINGS': '%s/ufc/ranks/weightClass/%s/basic',
    'GET_ELO_COUNT': '%s/ufc/scores/elo/fighter/%s/count'}},
  'flask': {'PORT': os.getenv('ufc.flask.flask.port')}}
 
