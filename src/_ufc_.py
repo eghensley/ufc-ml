@@ -46,6 +46,7 @@ D = datetime.timedelta(days = (365 * 2))
 def calc_rankings_for_wc(wc):
     rankings = getRankings(wc)['response']
     
+    print(rankings)
     fighters = {}
     wc_stat_univ = {}
     
