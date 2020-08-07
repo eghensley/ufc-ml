@@ -24,13 +24,14 @@ if (str(args.fport) != 'None'):
 if (str(args.spw) != 'None'):
     os.environ['ufc.flask.spring.pw'] = str(args.spw)
 
-#os.environ['ufc.flask.spring.host'] = 'http://localhost:4646'
-#print(os.environ)
+#    os.environ['ufc.flask.spring.host'] = 'http://localhost:4646'
+#    print(os.environ)
 
 from copy import deepcopy
 from db import addInfoToAllBouts
 from spring import getRankings, addBoutsToFutureFight
 from predictors import insert_new_ml_prob
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 from scipy.stats import percentileofscore
 import numpy as np
@@ -40,59 +41,94 @@ standard_response = {'status': 'Ok', 'errorMsg': None, 'itemsFound': 1, 'itemsCo
 fail_response = {'status': 'Internal Server Error', 'errorMsg': None, 'itemsFound': 1, 'itemsCompleted': 0, 'statusCode': 400}
 standard_get_response = {'status': 'Ok', 'errorMsg': None, 'itemsFound': 1, 'itemsCompleted': 1, 'statusCode': 200, 'response': None}
 
-#wc='WFFW'
+#   wc='WW'
 def calc_rankings_for_wc(wc):
     rankings = getRankings(wc)['response']
     
     print('pulled %s rankings' % (wc))
+    mm_fighters = {}
     fighters = {}
     wc_stat_univ = {}
     
     tot_rank_univ = []
     
+    scales = {}
+    mm_scales = {}
+    
     stat_cols = ['offStrikeEloPost',
                 'defStrikeEloPost',
                 'offGrapplingEloPost',
-                'defGrapplingEloPost'
+                'defGrapplingEloPost',
+                'powerStrikeEloPost',
+                'chinStrikeEloPost',
+                'subGrapplingEloPost',
+                'evasGrapplingEloPost'
                 ]
     
     for stat_name in stat_cols:
         wc_stat_univ[stat_name] = []
+        scales[stat_name] = StandardScaler()
+        mm_scales[stat_name] = MinMaxScaler()
         
     for rank in rankings:
         fighters[rank['fighterOid']] = {i:None for i in stat_cols}
         fighters[rank['fighterOid']]['name'] = rank['fighterName']
         fighters[rank['fighterOid']]['total'] = None
+        
+        mm_fighters[rank['fighterOid']] = {i:None for i in stat_cols}
+        mm_fighters[rank['fighterOid']]['name'] = rank['fighterName']
+        mm_fighters[rank['fighterOid']]['total'] = None
         for stat in stat_cols:
                 wc_stat_univ[stat].append(rank[stat])
     
+    for s_name in stat_cols:
+        scales[s_name].fit(np.array(wc_stat_univ[s_name]).reshape(-1, 1))
+        mm_scales[s_name].fit(np.array(wc_stat_univ[s_name]).reshape(-1, 1))
+
     print('  -- cleared rank init step 1')
     for f_rank in rankings:
-        for f_stat in stat_cols:        
-            fighters[f_rank['fighterOid']][f_stat] = percentileofscore(wc_stat_univ[f_stat], f_rank[f_stat], 'rank')
+        for f_stat in stat_cols:       
+            fighters[f_rank['fighterOid']][f_stat] = scales[f_stat].transform(np.array(f_rank[f_stat]).reshape(1, -1))[0][0]
+            mm_fighters[f_rank['fighterOid']][f_stat] = mm_scales[f_stat].transform(np.array(f_rank[f_stat]).reshape(1, -1))[0][0] * 100
+
+#            fighters[f_rank['fighterOid']][f_stat] = percentileofscore(wc_stat_univ[f_stat], f_rank[f_stat], 'rank')
     
     print('  -- cleared rank init step 2')
 
     for f_vals in fighters.values():
-        tot_rank_univ.append(np.sum([f_vals[i] for i in stat_cols]))
+        tot_rank_univ.append(np.sum([f_vals[i] for i in ['offStrikeEloPost', 'defStrikeEloPost', 'offGrapplingEloPost', 'defGrapplingEloPost']])) # ['offStrikeEloPost', 'defStrikeEloPost', 'offGrapplingEloPost', 'defGrapplingEloPost']
     
     print('  -- cleared rank init step 3')
 
+    tot_scale = MinMaxScaler()
+    tot_scale.fit(np.array(tot_rank_univ).reshape(-1, 1))
     for f_id, f_val in fighters.items():
-        f_val['total'] = percentileofscore(tot_rank_univ, np.sum([f_val[i] for i in stat_cols]), 'rank')
+        f_val['total'] = tot_scale.transform(np.array(np.sum([f_val[i] for i in ['offStrikeEloPost', 'defStrikeEloPost', 'offGrapplingEloPost', 'defGrapplingEloPost']]).reshape(1, -1)))[0][0] * 100 # 
+#        f_val['total'] = percentileofscore(tot_rank_univ, np.sum([f_val[i] for i in ['offStrikeEloPost', 'defStrikeEloPost', 'offGrapplingEloPost', 'defGrapplingEloPost']]), 'rank')
+    
     
     print('  -- cleared rank init step 4')
-
+    
+    mm_df = pd.DataFrame.from_dict(mm_fighters).T
     f_df = pd.DataFrame.from_dict(fighters).T
     f_df.sort_values('total', ascending = False, inplace = True)
-    f_df.reset_index(inplace = True)
-    f_df = f_df.loc[0:19]
-    
+#    f_df.reset_index(inplace = True)
+    f_df = f_df.iloc[0:25]
+    f_df = f_df[['name', 'total']]
+    mm_df = mm_df[['chinStrikeEloPost',
+         'defGrapplingEloPost',
+         'defStrikeEloPost',
+         'evasGrapplingEloPost',
+         'offGrapplingEloPost',
+         'offStrikeEloPost',
+         'powerStrikeEloPost',
+         'subGrapplingEloPost']]
+    df = f_df.join(mm_df)
     print('  -- cleared rank init step 5')
 
     response = []
-    for row in f_df.values:
-        response.append({'oid': row[0], 'name': row[3], 'total': row[6], 'defGrapp': row[1], 'defStrike': row[2], 'offGrapp': row[4], 'offStrike': row[5]})
+    for row in df.values:
+        response.append({'name': row[0], 'total': row[1], 'defKo': row[2],  'defGrapp': row[3], 'defStrike': row[4], 'defSub': row[5], 'offGrapp': row[6], 'offStrike': row[7], 'offKo': row[8], 'offSub': row[9]})
     print('  -- cleared rank init step 6; final.')
 
     return response
