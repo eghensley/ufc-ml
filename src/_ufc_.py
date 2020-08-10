@@ -12,7 +12,6 @@ if __name__ == "__main__":
     sys.path.append("src")
     os.environ['ufc.flask.spring.host'] = 'http://localhost:4646'
     os.environ['ufc.flask.spring.pw'] = '1234'
-
     print(os.environ)
     
 parser = argparse.ArgumentParser(description='UFC Prediction Engine')
