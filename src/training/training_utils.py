@@ -47,12 +47,21 @@ def _feat_reduction(x, y, domain = 'strike', refit = False):
         json.dump(best_feats, f)
         
 def retrieve_reduced_domain_features(domain = 'strike', refit = False):
-    if not os.path.exists('predictors/%s/opt.json' % (domain)) or refit:
-        X, Y = form_to_domain(domain = domain)
-        _feat_reduction(X, Y, domain = domain, refit = refit)
-    with open('predictors/%s/opt.json' % (domain), 'r') as f:
-        red_feats = json.load(f)    
-    return red_feats
+    try:
+        print('retrieve_reduced_domain_features - locating reduced features')
+        if not os.path.exists('src/predictors/%s/opt.json' % (domain)) or refit:
+            print('retrieve_reduced_domain_features - reduced features not found... adding')
+            X, Y = form_to_domain(domain = domain)
+            _feat_reduction(X, Y, domain = domain, refit = refit)
+        print('retrieve_reduced_domain_features - successfully located reduced features')
+        print('retrieve_reduced_domain_features - loading reduced features')
+        with open('src/predictors/%s/opt.json' % (domain), 'r') as f:
+            red_feats = json.load(f)    
+        print('retrieve_reduced_domain_features - successfully loaded reduced features')
+        return red_feats
+    except Exception as e:
+        print('retrieve_reduced_domain_features failed with %s' % (e))
+        raise e
 
 def form_to_domain(domain = 'strike'):
     if domain == 'all':

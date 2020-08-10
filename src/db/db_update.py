@@ -6,6 +6,12 @@ Created on Fri May  8 17:52:05 2020
 @author: ehens86
 """
 
+import sys, os
+if __name__ == "__main__":
+    sys.path.append("src")
+    os.environ['ufc.flask.spring.host'] = 'http://localhost:4646'
+    print(os.environ)
+
 from spring.api_wrappers import initUpdate, futureFightUpdate, getTrainingFights, addBoutsToFutureFight, getBoutsFromFight, addFutBoutData, addMyBookieOdds
 from db.parse_fights import addInfoToAllBouts, addFightOddsUrl, evalIfMissingFightOddsInfo, addFightOdds
 from predictors import insert_new_ml_scores, insert_new_ml_prob
@@ -30,7 +36,7 @@ from utils.general import convAmericanOddsToImpPerc
 
 #addInfoToAllBouts("53278852bcd91e11")
 #
-#   fight_id = 'dde70a112e053a6c'
+#   fight_id = '7a82635ffa9b59fe'
 def add_new_bouts(fight_id):
     addBoutsToFutureFight(fight_id)
     fight_details = getBoutsFromFight(fight_id)

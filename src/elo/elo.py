@@ -783,38 +783,49 @@ def _opt_elo(trial):
     return elo_mod.scores['cash']
     
 def populate_elo(bouts = None, refit = False):
-    if not os.path.exists("predictors/elo/elo-config.json"):
-        gen_config()
-    with open('predictors/elo/elo-config.json', 'r') as f:
-        params = json.load(f)
-    
-    if refit:
-        clearElo()
-        BOUTS = getAllBouts()
-    else:
-        BOUTS = bouts
+    try:
+        print('populate_elo - locating config')
+        if not os.path.exists("src/predictors/elo/elo-config.json"):
+            print('populate_elo - config not found... creating')
+            gen_config()
+        print('populate_elo - successfully located config')
+        with open('src/predictors/elo/elo-config.json', 'r') as f:
+            params = json.load(f)
+        print('populate_elo - successfully loaded config')
         
-    elo_mod = elo_model(cache = False,
-                            debug = True,
-#                            sd = params['elo_sd'], 
-#                            n_sims = params['elo_n_sims'],
-#                            fight_threshold = params['elo_fight_treshold'],
-                            strike_damper = params['strike_damper'],
-                            grappling_damper = params['grapp_damper'], 
-                            ko_damper = params['ko_finish_damper'], 
-                            sub_damper = params['sub_finish_damper'], 
-                            default_off_strike = params['default_off_strike'], 
-                            default_def_strike = params['default_def_strike'], 
-                            default_off_grappling = params['default_off_grapp'], 
-                            default_def_grappling = params['default_def_grapp'], 
-                            default_off_ko = params['default_off_ko'], 
-                            default_def_ko = params['default_def_ko'], 
-                            default_off_sub = params['default_off_sub'], 
-                            default_def_sub = params['default_def_sub'],
-                            sim = False
-                            )    
-    elo_mod.train(BOUTS)    
-   
+        if refit:
+            clearElo()
+            BOUTS = getAllBouts()
+        else:
+            BOUTS = bouts
+            
+        print('populate_elo - initializing elo engine')
+        elo_mod = elo_model(cache = False,
+                                debug = True,
+    #                            sd = params['elo_sd'], 
+    #                            n_sims = params['elo_n_sims'],
+    #                            fight_threshold = params['elo_fight_treshold'],
+                                strike_damper = params['strike_damper'],
+                                grappling_damper = params['grapp_damper'], 
+                                ko_damper = params['ko_finish_damper'], 
+                                sub_damper = params['sub_finish_damper'], 
+                                default_off_strike = params['default_off_strike'], 
+                                default_def_strike = params['default_def_strike'], 
+                                default_off_grappling = params['default_off_grapp'], 
+                                default_def_grappling = params['default_def_grapp'], 
+                                default_off_ko = params['default_off_ko'], 
+                                default_def_ko = params['default_def_ko'], 
+                                default_off_sub = params['default_off_sub'], 
+                                default_def_sub = params['default_def_sub'],
+                                sim = False
+                                )    
+        print('populate_elo - successfully initialized elo engine')
+        elo_mod.train(BOUTS)    
+        print('populate_elo - successfully updated elo scores')
+
+    except Exception as e:
+        print('insert_new_ml_prob failed with %s' % (e))
+        raise e   
 #def _opt_monte_carlo(trial):
 #    potential_params = {}
 #    monte_carlo_params = {}

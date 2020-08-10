@@ -6,9 +6,13 @@ Created on Fri Dec 27 17:06:55 2019
 @author: eric.hensleyibm.com
 """
 
-#import sys
-#if __name__ == "__main__":
-#    sys.path.append("..")
+import sys, os
+if __name__ == "__main__":
+    sys.path.append("src")
+    os.environ['ufc.flask.spring.host'] = 'http://localhost:4646'
+    os.environ['ufc.flask.spring.pw'] = '1234'
+
+    print(os.environ)
     
 from spring import addRoundScore, getAllFightIds, getBoutsFromFight, addBoutScoreUrls, \
                          addBoutsToFight, addBoutDetails, addFightOddsUrl, refreshBout, \
@@ -64,18 +68,18 @@ def evalIfMissingFightOddsInfo(fight_details):
         print('Fight %s is missing expected outcome data' % (fight_details['fightName']))
     return odds_completion
     
-#   fight_id = "dde70a112e053a6c"
+#   fight_id = "7a82635ffa9b59fe"
 def addInfoToAllBouts(fight_id):
     fight_details = getBoutsFromFight(fight_id)
-    print("Beginning full parse of %s (%s)" % (fight_details['fightName'], fight_details['fightId']))
+    print("addInfoToAllBouts - Beginning full parse of %s (%s)" % (fight_details['fightName'], fight_details['fightId']))
     fight_oid = fight_details["oid"]
     if evalIfAllBoutScoreUrls(fight_details):
-        print("Adding bout score URLs")
+        print("addInfoToAllBouts - Adding bout score URLs")
         addBoutScoreUrls(fight_oid)
     if not fight_details['completed']:
-        print("No bouts included for fight... adding")
+        print("addInfoToAllBouts - No bouts included for fight... adding")
         addBoutsToFight(fight_id)
-        print("Refreshing fight info after adding bouts")
+        print("addInfoToAllBouts - Refreshing fight info after adding bouts")
         fight_details = getBoutsFromFight(fight_id)
 #    if ADD_ODDS and fight_details['bestFightOddsUrl'] is None:
 #        addFightOddsUrl(fight_details)
@@ -83,24 +87,24 @@ def addInfoToAllBouts(fight_id):
         if (bout_detail['completed']):
             if (len(bout_detail['fighterBoutXRefs']) != 2):
                 print("~~~~~~ INCOMPLETE BOUT (%s) ~~~~~~~~~" % (bout_detail['oid']))
-            print("Bout %s already completed.. skipping detail scrape" % bout_detail['oid'])
+            print("addInfoToAllBouts - Bout %s already completed.. skipping detail scrape" % bout_detail['oid'])
             if (evalIfMissingBoutScores(bout_detail)):
-                print("Adding bout round scores")
+                print("addInfoToAllBouts - Adding bout round scores")
                 scrapeBoutScores(bout_detail['oid'])
         else:
-            print("Beginning update of bout %s" % (bout_detail['boutId']))
+            print("addInfoToAllBouts - Beginning update of bout %s" % (bout_detail['boutId']))
             bout_detail_parse_response = addBoutDetails(fight_id, bout_detail['boutId'])
             if (bout_detail_parse_response != True):
                 break
             refreshed_bout_detail = refreshBout(bout_detail['boutId'])
             if (evalIfMissingBoutScores(refreshed_bout_detail)):
-                print("Adding bout round scores")
+                print("addInfoToAllBouts - Adding bout round scores")
                 scrapeBoutScores(bout_detail['oid'])
 #        if bout_detail['gender'] != 'MALE':
-        print("Updating ML scores")
+        print("addInfoToAllBouts - Updating ML scores")
         insert_new_ml_scores(bout_detail['boutId'])
         insert_new_ml_prob(bout_detail['boutId'])
-        print("Updating ELO scores")
+        print("addInfoToAllBouts - Updating ELO scores")
         populate_elo(bouts = [bout_detail['boutId']], refit = False)
 #        populate_elo_bout(bout_detail['boutId'])
     fight_details_refreshed = getBoutsFromFight(fight_id)

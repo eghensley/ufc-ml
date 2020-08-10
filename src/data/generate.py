@@ -6,6 +6,14 @@ Created on Sat Mar 28 21:15:18 2020
 @author: eric.hensleyibm.com
 """
     
+import sys, os
+if __name__ == "__main__":
+    sys.path.append("src")
+    os.environ['ufc.flask.spring.host'] = 'http://localhost:4646'
+    os.environ['ufc.flask.spring.pw'] = '1234'
+
+    print(os.environ)
+    
 import os
 import numpy as np
 import pandas as pd
@@ -117,15 +125,21 @@ def pull_ml_training_corpus():
     data = data[data['gender'] == 'M']
     return data
 
-#fight_id, bout_id = '4834ff149dc9542a', '0e8d5c16eb9cb1cf'
+#   bout_id = '26173f6491300eaa'
 def pull_bout_data(bout_id):
-    raw_data = getBoutData(bout_id)
-    data_dict = {}
-    for data_row in raw_data:
-        data_dict[data_row['oid']] = data_row
-    data = pd.DataFrame.from_dict(data_dict).T
-    data = add_gender_col(data)
-    data = add_class_col(data)
-    data = conv_stats_to_rate(data)
-    data = add_share_cols_new(data)
-    return data
+    try:
+        print('pull_bout_data - getting bout data')
+        raw_data = getBoutData(bout_id)
+        print('pull_bout_data - successfully got bout data')
+        data_dict = {}
+        for data_row in raw_data:
+            data_dict[data_row['oid']] = data_row
+        data = pd.DataFrame.from_dict(data_dict).T
+        data = add_gender_col(data)
+        data = add_class_col(data)
+        data = conv_stats_to_rate(data)
+        data = add_share_cols_new(data)
+        return data
+    except Exception as e:
+        print('pull_bout_data failed with %s' % (e))
+        raise e

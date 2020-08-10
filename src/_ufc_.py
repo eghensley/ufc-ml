@@ -6,8 +6,15 @@ Created on Thu Jun 18 12:11:19 2020
 @author: eric.hensleyibm.com
 """
 import argparse
-import os
+import sys, os
 
+if __name__ == "__main__":
+    sys.path.append("src")
+    os.environ['ufc.flask.spring.host'] = 'http://localhost:4646'
+    os.environ['ufc.flask.spring.pw'] = '1234'
+
+    print(os.environ)
+    
 parser = argparse.ArgumentParser(description='UFC Prediction Engine')
 parser.add_argument('--fport', type=int,
                     help='Flask Port')
@@ -29,11 +36,10 @@ if (str(args.spw) != 'None'):
 
 from copy import deepcopy
 from db import addInfoToAllBouts
-from spring import getRankings, addBoutsToFutureFight
+from spring import getRankings, addBoutsToFutureFight, initUpdate, futureFightUpdate
 from predictors import insert_new_ml_prob
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
-from scipy.stats import percentileofscore
 import numpy as np
 import pandas as pd
 
@@ -41,7 +47,7 @@ standard_response = {'status': 'Ok', 'errorMsg': None, 'itemsFound': 1, 'itemsCo
 fail_response = {'status': 'Internal Server Error', 'errorMsg': None, 'itemsFound': 1, 'itemsCompleted': 0, 'statusCode': 400}
 standard_get_response = {'status': 'Ok', 'errorMsg': None, 'itemsFound': 1, 'itemsCompleted': 1, 'statusCode': 200, 'response': None}
 
-#   wc='WW'
+#   wc='HW'
 def calc_rankings_for_wc(wc):
     rankings = getRankings(wc)['response']
     
@@ -73,10 +79,12 @@ def calc_rankings_for_wc(wc):
     for rank in rankings:
         fighters[rank['fighterOid']] = {i:None for i in stat_cols}
         fighters[rank['fighterOid']]['name'] = rank['fighterName']
+        fighters[rank['fighterOid']]['fighterOid'] = rank['fighterOid']
         fighters[rank['fighterOid']]['total'] = None
         
         mm_fighters[rank['fighterOid']] = {i:None for i in stat_cols}
         mm_fighters[rank['fighterOid']]['name'] = rank['fighterName']
+        mm_fighters[rank['fighterOid']]['fighterOid'] = rank['fighterOid']
         mm_fighters[rank['fighterOid']]['total'] = None
         for stat in stat_cols:
                 wc_stat_univ[stat].append(rank[stat])
@@ -113,8 +121,8 @@ def calc_rankings_for_wc(wc):
     f_df = pd.DataFrame.from_dict(fighters).T
     f_df.sort_values('total', ascending = False, inplace = True)
 #    f_df.reset_index(inplace = True)
-    f_df = f_df.iloc[0:25]
-    f_df = f_df[['name', 'total']]
+#    f_df = f_df.iloc[0:25]
+    f_df = f_df[['name', 'fighterOid', 'total']]
     mm_df = mm_df[['chinStrikeEloPost',
          'defGrapplingEloPost',
          'defStrikeEloPost',
@@ -126,18 +134,23 @@ def calc_rankings_for_wc(wc):
     df = f_df.join(mm_df)
     print('  -- cleared rank init step 5')
 
+    list(df)
     response = []
-    for row in df.values:
-        response.append({'name': row[0], 'total': row[1], 'defKo': row[2],  'defGrapp': row[3], 'defStrike': row[4], 'defSub': row[5], 'offGrapp': row[6], 'offStrike': row[7], 'offKo': row[8], 'offSub': row[9]})
+    fighter_response = {}
+    for i, (row) in enumerate(df.values):
+        if (i < 15):
+            response.append({'name': row[0], 'fighterOid': row[1], 'total': row[2], 'defKo': row[3],  'defGrapp': row[4], 'defStrike': row[5], 'defSub': row[6], 'offGrapp': row[7], 'offStrike': row[8], 'offKo': row[9], 'offSub': row[10]})
+        fighter_response[row[1]] = {'name': row[0], 'fighterOid': row[1], 'total': row[2], 'defKo': row[3],  'defGrapp': row[4], 'defStrike': row[5], 'defSub': row[6], 'offGrapp': row[7], 'offStrike': row[8], 'offKo': row[9], 'offSub': row[10]}
     print('  -- cleared rank init step 6; final.')
 
-    return response
+    return response, fighter_response
 
 class ufc_engine:
     
     def __init__(self, pw):
         self.pw = pw
         self.weight_class_rankings = {}
+        self.weight_class_fighters = {}
         self.weight_classes = ['WW',
                                 'FW',
                                 'WSW',
@@ -152,7 +165,7 @@ class ufc_engine:
                                 'HW']
         for wc in self.weight_classes:
             print('initializing %s' % (wc))
-            self.weight_class_rankings[wc] = calc_rankings_for_wc(wc)
+            self.weight_class_rankings[wc], self.weight_class_fighters[wc] = calc_rankings_for_wc(wc)
             print('initialized %s' % (wc))
         
     def authenticate(self, headers):
@@ -212,8 +225,33 @@ class ufc_engine:
             resp['errorMsg'] = e
             return resp         
             
-        
+    def popFutureBouts(self):
+        try:
+            futureFightUpdate()
+            initUpdate()
+            return standard_response
+        except Exception as e:
+            print('Request failed with %s' % (e))
+            resp = deepcopy(fail_response)
+            resp['errorMsg'] = e
+            return resp       
 
+    def get_ranking_for_wc_fighter(self, wc, fighterOid):
+        try:
+            if (wc.upper() in self.weight_class_fighters.keys() and fighterOid in self.weight_class_fighters[wc].keys()):
+                resp = deepcopy(standard_get_response)
+                resp['response'] = self.weight_class_fighters[wc.upper()][fighterOid]
+                return resp
+            else:
+                resp = deepcopy(fail_response)
+                resp['errorMsg'] = '%s is not a supported weight class' % (wc)
+                return resp 
+        except Exception as e:
+            print('Request failed with %s' % (e))
+            resp = deepcopy(fail_response)
+            resp['errorMsg'] = e
+            return resp 
+        
 #model = ufc_engine()
 #model._update_fight_list()
 #
