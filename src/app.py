@@ -38,6 +38,11 @@ def getWeightClassRanks(weightClass):
     response = engine.get_ranking_for_wc(weightClass)
     return jsonify(response), response['statusCode']
 
+@app.route('/ufc/api/v1.0/rankings/top', methods=['GET'])
+def getTopWeightClassRanks():
+    response = engine.get_top_wc_ranks()
+    return jsonify(response), response['statusCode']
+
 @app.route('/ufc/api/v1.0/rankings/<weightClass>/fighter/<fighterOid>', methods=['GET'])
 def getWeightClassFighterRank(weightClass, fighterOid):
     response = engine.get_ranking_for_wc_fighter(weightClass, fighterOid)

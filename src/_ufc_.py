@@ -150,8 +150,7 @@ class ufc_engine:
         self.pw = pw
         self.weight_class_rankings = {}
         self.weight_class_fighters = {}
-        self.weight_classes = ['WW',
-                                'FW',
+        self.weight_classes = [ 'FW',
                                 'WSW',
                                 'WFW',
                                 'BW',
@@ -160,6 +159,7 @@ class ufc_engine:
                                 'WFFW',
                                 'LW',
                                 'MW',
+                                'WW',
                                 'LHW',
                                 'HW']
         for wc in self.weight_classes:
@@ -213,6 +213,22 @@ class ufc_engine:
             resp = deepcopy(fail_response)
             resp['errorMsg'] = e
             return resp 
+        
+    def get_top_wc_ranks(self):
+        try:
+            resp = deepcopy(standard_get_response)
+            resp['response'] = []
+            for wc in self.weight_classes:
+                resp['response'].append({'wc': wc.upper(), 'top': self.weight_class_rankings[wc.upper()][0]})
+            return resp
+        except Exception as e:
+            print('Request failed with %s' % (e))
+            resp = deepcopy(fail_response)
+            resp['errorMsg'] = e
+            return resp         
+        
+        
+        
         
     def addMlProb(self, boutId):
         try:
