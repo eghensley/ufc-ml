@@ -187,7 +187,7 @@ def insert_new_ml_scores(bout_id):
         print('insert_new_ml_scores failed with %s' % (e))
         raise e
         
-#    bout_id = 'e16f42a666e163d8'
+#    bout_id = '054794810817c1cc'
 def insert_new_ml_prob(bout_id):
     try:
         bout_detail = refreshBout(bout_id)

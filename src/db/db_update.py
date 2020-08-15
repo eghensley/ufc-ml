@@ -10,6 +10,8 @@ import sys, os
 if __name__ == "__main__":
     sys.path.append("src")
     os.environ['ufc.flask.spring.host'] = 'http://localhost:4646'
+    os.environ['ufc.flask.spring.pw'] = '1234'
+
     print(os.environ)
 
 from spring.api_wrappers import initUpdate, futureFightUpdate, getTrainingFights, addBoutsToFutureFight, getBoutsFromFight, addFutBoutData, addMyBookieOdds
@@ -36,7 +38,7 @@ from utils.general import convAmericanOddsToImpPerc
 
 #addInfoToAllBouts("53278852bcd91e11")
 #
-#   fight_id = '7a82635ffa9b59fe'
+#   fight_id = 'bda04c573563cc2e'
 def add_new_bouts(fight_id):
     addBoutsToFutureFight(fight_id)
     fight_details = getBoutsFromFight(fight_id)

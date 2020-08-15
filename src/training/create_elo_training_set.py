@@ -26,15 +26,15 @@ def generate_json_data():
         if bout_data is not None:
             fight_data[bout_oid] = bout_data
         
-    with open("training/elo/elo_preds.json", "w") as file:
+    with open("src/training/elo/elo_preds.json", "w") as file:
         json.dump(fight_data, file)
     
 def generate_csv_data():
     print('generating csv elo data')
-    if not os.path.exists("training/elo/elo_preds.json"):
+    if not os.path.exists("src/training/elo/elo_preds.json"):
         generate_json_data()
     
-    with open("training/elo/elo_preds.json", "r") as file:
+    with open("src/training/elo/elo_preds.json", "r") as file:
         fight_data = json.load(file)
 
     training_data = {}
@@ -47,10 +47,10 @@ def generate_csv_data():
     training_df.to_csv("training/elo/elo_predictors.csv")
     
 def pull_ml_training():
-    if not os.path.exists('training/elo/elo_predictors.csv'):
+    if not os.path.exists('src/training/elo/elo_predictors.csv'):
         generate_csv_data()
     
-    df = pd.read_csv('training/elo/elo_predictors.csv')
+    df = pd.read_csv('src/training/elo/elo_predictors.csv')
     df.set_index('Unnamed: 0', inplace = True)
 #    test = df.loc['0b89c88d506da083']
     return df
