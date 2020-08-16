@@ -64,6 +64,11 @@ def initFuture():
         response = engine.popFutureBouts()
         return jsonify(response), response['statusCode']
     
+@app.route('/ufc/api/v1.0/explain/bout/<boutId>', methods=['GET'])
+def getBoutExplainer(boutId):
+    response = engine.gen_win_pred_explainer(boutId)
+    return jsonify(response), response['statusCode']
+    
 if __name__ == '__main__':
     print('initializing')
     engine = ufc_engine(CONFIG['spring']['PW'])
