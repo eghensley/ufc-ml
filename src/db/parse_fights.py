@@ -9,7 +9,7 @@ Created on Fri Dec 27 17:06:55 2019
 import sys, os
 if __name__ == "__main__":
     sys.path.append("src")
-    os.environ['ufc.flask.spring.host'] = 'http://localhost:4646'
+    os.environ['ufc.flask.spring.host'] = 'http://207.237.93.29:4646'
     os.environ['ufc.flask.spring.pw'] = '1234'
 
     print(os.environ)
@@ -68,7 +68,7 @@ def evalIfMissingFightOddsInfo(fight_details):
         print('Fight %s is missing expected outcome data' % (fight_details['fightName']))
     return odds_completion
     
-#   fight_id = "7a82635ffa9b59fe"
+#   fight_id = "bda04c573563cc2e"
 def addInfoToAllBouts(fight_id):
     fight_details = getBoutsFromFight(fight_id)
     print("addInfoToAllBouts - Beginning full parse of %s (%s)" % (fight_details['fightName'], fight_details['fightId']))
@@ -84,6 +84,7 @@ def addInfoToAllBouts(fight_id):
 #    if ADD_ODDS and fight_details['bestFightOddsUrl'] is None:
 #        addFightOddsUrl(fight_details)
     for bout_detail in fight_details['bouts']:
+        # asdfasdf
         if (bout_detail['completed']):
             if (len(bout_detail['fighterBoutXRefs']) != 2):
                 print("~~~~~~ INCOMPLETE BOUT (%s) ~~~~~~~~~" % (bout_detail['oid']))

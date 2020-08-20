@@ -69,8 +69,28 @@ class bet_eval:
         self._bout_info = None
 
     def _wager_funct(self, conf_diff, f1_num, f2_num):
+        
+        print(conf_diff)
+        print(f1_num)
+        print(f2_num)
+
+        conf_diff_lin_comp = self.conf_diff_lin * conf_diff
+        conf_diff_quad_comp = self.conf_diff_quad * (conf_diff**2)
+        f1_num_fight_lin_comp = self.num_fight_lin * f1_num * 2
+        f2_num_fight_lin_comp = self.num_fight_lin * f2_num * 2
+        f1_num_fight_quad_comp = (f1_num**2) * self.num_fight_quad * 2
+        f2_num_fight_quad_comp = (f2_num**2) * self.num_fight_quad * 2
+        
+        print(conf_diff_lin_comp)
+        print(conf_diff_quad_comp)
+        print(f1_num_fight_lin_comp)
+        print(f2_num_fight_lin_comp)
+        print(f1_num_fight_quad_comp)
+        print(f2_num_fight_quad_comp)
+        print(self.bet_intercept + conf_diff_lin_comp + conf_diff_quad_comp + f1_num_fight_lin_comp + f2_num_fight_lin_comp + f1_num_fight_quad_comp + f2_num_fight_quad_comp)
         bet_mult = self.bet_intercept + (self.conf_diff_lin * conf_diff) + (self.conf_diff_quad * (conf_diff**2)) + (self.num_fight_lin * f1_num) + (self.num_fight_quad * (f1_num**2)) + (self.num_fight_lin * f2_num) + (self.num_fight_quad * (f2_num**2)) + (f1_num * self.num_fight_lin) + ((f1_num**2) * self.num_fight_quad) + (f2_num * self.num_fight_lin) + ((f2_num**2) * self.num_fight_quad)
         to_wager = bet_mult * self.standard_wager
+        print(to_wager)
 #        print("%s + (%s * %s) + (%s * (%s**2)) + (%s * %s) + (%s * (%s**2)) + (%s * %s) + (%s * (%s**2)))" % (self.bet_intercept, self.conf_diff_lin, conf_diff, self.conf_diff_quad, conf_diff, self.num_fight_lin, f1_num, self.num_fight_quad, f1_num, self.num_fight_lin, f2_num, self.num_fight_quad, f2_num))
 #        print("$%s" % (to_wager))
         if to_wager < 0:

@@ -11,7 +11,7 @@ if __name__ == "__main__":
     sys.path.append("..")
 
 import os
-from spring.api_wrappers import updateRanking, getAllBouts, refreshBout, getLastElo, updateElo, clearElo, getYearBouts
+from spring.api_wrappers import updateRanking, getAllBouts, refreshBout, getLastElo, updateElo, clearElo, getYearBouts, getBoutData
 import math
 import json
 import pandas as pd
@@ -556,7 +556,10 @@ class elo_model:
             
     def proc_bout(self):
         self.reset_bout()
+        # self.bout_info = getBoutData(self.bout_oid)
+        # print(self.bout_info)
         self.bout_info = refreshBout(self.bout_oid)
+        print(self.bout_info)
 #        if self.bout_info['gender'] != 'MALE':
 #            if self.debug:
 #                print("Skipping bout %s.. not male" % (self.bout_info['oid']))

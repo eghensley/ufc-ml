@@ -100,88 +100,52 @@ for top_idx in top_10:
 
 
 effects = {}
-line_data = {'name': 'TEAM A', 'type': 'line', 'data': []}
-area_data = {'name': 'TEAM A', 'type': 'area', 'data': []}
+line_data = {'name': 'Feature Impact', 'type': 'line', 'data': []}
+area_data = {'name': 'Cumulative Confidence', 'type': 'area', 'data': []}
 
 conf = 0
 
 
-label_translator: {'age_1': 'blue corner age',
- 'age_2': 'red corner age',
- 'age_diff': 'blue - red age',
- 'def_ko_1': 'red corner chin',
- 'def_ko_2': 'blue corner chin',
- 'def_ko_diff': 'blue - red chin',
- 'def_ko_share': 'blue / (blue + red) chin',
- 'def_strike_1': 'blue strike defense',
- 'def_strike_2': 'red strike defense',
- 'def_strike_diff',
- 'def_strike_share',
- 'eff_grap_1',
- 'eff_grap_2',
- 'eff_grap_diff',
- 'eff_grap_share',
- 'eff_ko_2',
- 'eff_strike_1',
- 'eff_strike_2',
- 'eff_strike_diff',
- 'eff_strike_share',
- 'off_grapp_1',
- 'off_grapp_2',
- 'off_grapp_diff',
- 'off_grapp_share',
- 'off_ko_1',
- 'off_ko_diff',
- 'off_ko_share',
- 'off_strike_1',
- 'off_strike_2',
- 'off_strike_diff',
- 'off_strike_share',
- 'prev_fights_1',
- 'prev_fights_2',
- 'rounds']
+label_translator = {'age_1': 'BC Age',
+ 'age_2': 'RC Age',
+ 'age_diff': 'Age DIFF',
+ 'def_ko_1': 'RC Chin',
+ 'def_ko_2': 'BC Chin',
+ 'def_ko_diff': 'Chin DIFF',
+ 'def_ko_share': 'Chin SHARE',
+ 'def_strike_1': 'BC Striking Def',
+ 'def_strike_2': 'RC Striking Def',
+ 'def_strike_diff': 'Striking Def DIFF',
+ 'def_strike_share': 'Striking Def SHARE',
+ 'eff_grap_1': 'BC Grappling EFF',
+ 'eff_grap_2': 'RC Grappling EFF',
+ 'eff_grap_diff': 'Grappling EFF DIFF',
+ 'eff_grap_share': 'Grappling EFF SHARE',
+ 'eff_ko_2': 'RC KO EFF',
+ 'eff_strike_1': 'BC Striking EFF',
+ 'eff_strike_2': 'RC Striking EFF',
+ 'eff_strike_diff': 'Striking EFF DIFF',
+ 'eff_strike_share': 'Striking EFF SHARE',
+ 'off_grapp_1': 'BC Grappling Off',
+ 'off_grapp_2': 'RC Grappling Off',
+ 'off_grapp_diff': 'Grappling Off DIFF',
+ 'off_grapp_share': 'Grappling Off SHARE',
+ 'off_ko_1': 'BC KO',
+ 'off_ko_diff': 'KO DIFF',
+ 'off_ko_share': 'KO SHARE',
+ 'off_strike_1': 'BC Strike Off',
+ 'off_strike_2': 'RC Strike Off',
+ 'off_strike_diff': 'Strike Off DIFF',
+ 'off_strike_share': 'Strike Off SHARE',
+ 'prev_fights_1': 'BC Num Fights',
+ 'prev_fights_2': 'RC Num Fights',
+ 'rounds': 'Rounds'
+}
 
 
 
 
 [x for _,x in sorted(zip([abs(i) for i in shap_values[1][0]], list(new_row)))]
 
-sorted_indexes = [x for _,x in sorted(zip([abs(i) for i in shap_values[1][0]], range(len(shap_values[1][0]))))]
 
-
-top_10 = sorted_indexes[-10:]
-
-for idx in sorted_indexes[:-10]:
-    i = shap_values[1][0][idx]
-    if (i != 0) :
-        new_conf = conf + ((1/(1 + np.exp(-1*(i)))) - .5)
-    else:
-        new_conf = conf
-    conf = new_conf
-line_data['data'].append(conf)
-area_data['data'].append(conf)
-
-for top_idx in top_10:
-    i = shap_values[1][0][top_idx]
-    j = list(new_row)[top_idx]
-    effects[j] = i
-    
-    if (i != 0) :
-        effect = (1/(1 + np.exp(-1*(i)))) - .5
-    else:
-        effect = 0
-
-    line_data['data'].append(effect)
-    conf += effect
-    area_data['data'].append(conf)        
-    
-    if (conf >= new_conf):
-        row['y'].append(new_conf)
-        row['y'].append(conf)
-    else:
-        row['y'].append(conf)
-        row['y'].append(new_conf)
-        
-    data.append(row)
-    conf = new_conf
 
