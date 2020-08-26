@@ -169,41 +169,41 @@ class ufc_engine:
             print('initializing %s' % (wc))
             self.weight_class_rankings[wc], self.weight_class_fighters[wc] = calc_rankings_for_wc(wc)
             print('initialized %s' % (wc))
-        self.label_translator = {"age_1": "BC Age",
-             'age_2': 'RC Age',
-             'age_diff': 'Age DIFF',
-             'def_ko_1': 'RC Chin',
-             'def_ko_2': 'BC Chin',
-             'def_ko_diff': 'Chin DIFF',
-             'def_ko_share': 'Chin SHARE',
-             'def_strike_1': 'BC Striking Def',
-             'def_strike_2': 'RC Striking Def',
-             'def_strike_diff': 'Striking Def DIFF',
-             'def_strike_share': 'Striking Def SHARE',
-             'eff_grap_1': 'BC Grappling EFF',
-             'eff_grap_2': 'RC Grappling EFF',
-             'eff_grap_diff': 'Grappling EFF DIFF',
-             'eff_grap_share': 'Grappling EFF SHARE',
-             'eff_ko_2': 'RC KO EFF',
-             'eff_strike_1': 'BC Striking EFF',
-             'eff_strike_2': 'RC Striking EFF',
-             'eff_strike_diff': 'Striking EFF DIFF',
-             'eff_strike_share': 'Striking EFF SHARE',
-             'off_grapp_1': 'BC Grappling Off',
-             'off_grapp_2': 'RC Grappling Off',
-             'off_grapp_diff': 'Grappling Off DIFF',
-             'off_grapp_share': 'Grappling Off SHARE',
-             'off_ko_1': 'BC KO',
-             'off_ko_diff': 'KO DIFF',
-             'off_ko_share': 'KO SHARE',
-             'off_strike_1': 'BC Strike Off',
-             'off_strike_2': 'RC Strike Off',
-             'off_strike_diff': 'Strike Off DIFF',
-             'off_strike_share': 'Strike Off SHARE',
-             'prev_fights_1': 'BC Num Fights',
-             'prev_fights_2': 'RC Num Fights',
-             'rounds': 'Rounds'
-        }
+            self.label_translator = {"age_1": "BC Age",
+                 'age_2': 'RC Age',
+                 'age_diff': 'Age DIFF',
+                 'def_ko_1': 'RC Chin',
+                 'def_ko_2': 'BC Chin',
+                 'def_ko_diff': 'Chin DIFF',
+                 'def_ko_share': 'Chin SHARE',
+                 'def_strike_1': 'BC Striking Def',
+                 'def_strike_2': 'RC Striking Def',
+                 'def_strike_diff': 'Striking Def DIFF',
+                 'def_strike_share': 'Striking Def SHARE',
+                 'eff_grap_1': 'BC Grappling EFF',
+                 'eff_grap_2': 'RC Grappling EFF',
+                 'eff_grap_diff': 'Grappling EFF DIFF',
+                 'eff_grap_share': 'Grappling EFF SHARE',
+                 'eff_ko_2': 'RC KO EFF',
+                 'eff_strike_1': 'BC Striking EFF',
+                 'eff_strike_2': 'RC Striking EFF',
+                 'eff_strike_diff': 'Striking EFF DIFF',
+                 'eff_strike_share': 'Striking EFF SHARE',
+                 'off_grapp_1': 'BC Grappling Off',
+                 'off_grapp_2': 'RC Grappling Off',
+                 'off_grapp_diff': 'Grappling Off DIFF',
+                 'off_grapp_share': 'Grappling Off SHARE',
+                 'off_ko_1': 'BC KO',
+                 'off_ko_diff': 'KO DIFF',
+                 'off_ko_share': 'KO SHARE',
+                 'off_strike_1': 'BC Strike Off',
+                 'off_strike_2': 'RC Strike Off',
+                 'off_strike_diff': 'Strike Off DIFF',
+                 'off_strike_share': 'Strike Off SHARE',
+                 'prev_fights_1': 'BC Num Fights',
+                 'prev_fights_2': 'RC Num Fights',
+                 'rounds': 'Rounds'
+            }
 
 
         print('retrieve_best_trained_models - loading best model')
@@ -394,7 +394,7 @@ class ufc_engine:
                 fighter_1_data['data'].append(0)
                 fighter_2_data['data'].append(effect)
                 
-            conf = new_conf
+            # conf = new_conf
             columns.append(j)
         
         columns.append('Total')
