@@ -44,7 +44,7 @@ def generate_csv_data():
             training_data[bout_oid] = bout_training_data
         
     training_df = pd.DataFrame.from_dict(training_data).T
-    training_df.to_csv("training/elo/elo_predictors.csv")
+    training_df.to_csv("src/training/elo/elo_predictors.csv")
     
 def pull_ml_training():
     if not os.path.exists('src/training/elo/elo_predictors.csv'):

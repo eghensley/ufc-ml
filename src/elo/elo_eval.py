@@ -28,9 +28,9 @@ def gen_score_report(domain):
 #    domain = 'strike'
     all_scores = {}
         
-    onlyfiles = [f for f in listdir("elo/scores/%s" % (domain)) if isfile(join("elo/scores/%s" % (domain), f))]
+    onlyfiles = [f for f in listdir("src/elo/scores/%s" % (domain)) if isfile(join("src/elo/scores/%s" % (domain), f))]
     for file in onlyfiles:
-        with open('elo/scores/%s/%s'% (domain, file)) as f:
+        with open('src/elo/scores/%s/%s'% (domain, file)) as f:
             data = json.load(f)
         for feat in [i for i in data.keys() if i.find('Elo') > -1]:
             if len(data[feat]) == 0:
@@ -55,7 +55,7 @@ def gen_score_report(domain):
         
     ranked_scores = {}
     for file in onlyfiles:
-        with open('elo/scores/%s/%s'% (domain, file)) as f:
+        with open('src/elo/scores/%s/%s'% (domain, file)) as f:
             data = json.load(f)
         
         idx = file.replace('.json', '')
@@ -91,7 +91,7 @@ def gen_config():
        
     params = {}
     for ft in models.keys():
-        with open('elo/models/%s/%s.json' % (ft, models[ft])) as f:
+        with open('src/elo/models/%s/%s.json' % (ft, models[ft])) as f:
             param = json.load(f)
         if ft == 'strike':
             params['default_off_strike'] = param['defaults']['offStrike']
@@ -110,6 +110,6 @@ def gen_config():
             params['sub_finish_damper'] = param['defaults']['evasGrappling']
             params['default_def_sub'] = param['dampers']['subGrappling']
     
-    with open('predictors/elo/elo-config.json', 'w') as r:
+    with open('src/predictors/elo/elo-config.json', 'w') as r:
         json.dump(params, r)
 

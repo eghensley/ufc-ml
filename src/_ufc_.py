@@ -10,7 +10,7 @@ import sys, os
 
 if __name__ == "__main__":
     sys.path.append("src")
-    os.environ['ufc.flask.spring.host'] = 'http://207.237.93.29:4646'
+    os.environ['ufc.flask.spring.host'] = 'http://192.168.1.64:4646'#'http://68.248.220.199:4646'
     os.environ['ufc.flask.spring.pw'] = '1234'
     print(os.environ)
     
@@ -169,40 +169,89 @@ class ufc_engine:
             print('initializing %s' % (wc))
             self.weight_class_rankings[wc], self.weight_class_fighters[wc] = calc_rankings_for_wc(wc)
             print('initialized %s' % (wc))
-        self.label_translator = {"age_1": "BC Age",
-             'age_2': 'RC Age',
-             'age_diff': 'Age DIFF',
-             'def_ko_1': 'RC Chin',
-             'def_ko_2': 'BC Chin',
-             'def_ko_diff': 'Chin DIFF',
-             'def_ko_share': 'Chin SHARE',
-             'def_strike_1': 'BC Striking Def',
-             'def_strike_2': 'RC Striking Def',
-             'def_strike_diff': 'Striking Def DIFF',
-             'def_strike_share': 'Striking Def SHARE',
-             'eff_grap_1': 'BC Grappling EFF',
-             'eff_grap_2': 'RC Grappling EFF',
-             'eff_grap_diff': 'Grappling EFF DIFF',
-             'eff_grap_share': 'Grappling EFF SHARE',
-             'eff_ko_2': 'RC KO EFF',
-             'eff_strike_1': 'BC Striking EFF',
-             'eff_strike_2': 'RC Striking EFF',
-             'eff_strike_diff': 'Striking EFF DIFF',
-             'eff_strike_share': 'Striking EFF SHARE',
-             'off_grapp_1': 'BC Grappling Off',
-             'off_grapp_2': 'RC Grappling Off',
-             'off_grapp_diff': 'Grappling Off DIFF',
-             'off_grapp_share': 'Grappling Off SHARE',
-             'off_ko_1': 'BC KO',
-             'off_ko_diff': 'KO DIFF',
-             'off_ko_share': 'KO SHARE',
-             'off_strike_1': 'BC Strike Off',
-             'off_strike_2': 'RC Strike Off',
-             'off_strike_diff': 'Strike Off DIFF',
-             'off_strike_share': 'Strike Off SHARE',
-             'prev_fights_1': 'BC Num Fights',
-             'prev_fights_2': 'RC Num Fights',
-             'rounds': 'Rounds'
+        self.label_translator = {
+                                "age_1": "BC Age",
+                                'age_2': 'RC Age',
+                                'age_diff': 'Age DIFF',
+                                'age_share': 'Age SHARE', 
+                                'def_grapp_1': 'BC Grappling Def', 
+                                'def_grapp_2': 'RC Grappling Def', 
+                                'def_grapp_diff': 'Grappling Def DIFF', 
+                                'def_grapp_share': 'Grappling Def SHARE', 
+                                'def_ko_2': 'BC Chin',
+                                'def_ko_diff': 'Chin DIFF',
+                                'def_ko_share': 'Chin SHARE', 
+                                'def_strike_1': 'BC Striking Def',
+                                'def_strike_2': 'RC Striking Def',
+                                'def_strike_diff': 'Striking Def DIFF',
+                                'def_strike_share': 'Striking Def SHARE',
+                                'def_sub_1': 'BC Submission Def', 
+                                'def_sub_2': 'RC Submission Def', 
+                                'def_sub_diff': 'Submission Def DIFF', 
+                                'def_sub_share': 'Submission Def SHARE', 
+                                'eff_grap_1': 'BC Grappling EFF',
+                                'eff_grap_2': 'RC Grappling EFF',
+                                'eff_grap_diff': 'Grappling EFF DIFF',
+                                'eff_grap_share': 'Grappling EFF SHARE',
+                                'eff_ko_1': 'BC KO EFF', 
+                                'eff_ko_2': 'RC KO EFF', 
+                                'eff_ko_diff': 'KO EFF DIFF', 
+                                'eff_ko_share': 'KO EFF SHARE', 
+                                'eff_strike_1': 'BC Striking EFF',
+                                'eff_strike_2': 'RC Striking EFF',
+                                'eff_strike_diff': 'Striking EFF DIFF',
+                                'eff_strike_share': 'Striking EFF SHARE',
+                                'eff_sub_1': 'BC Submission EFF', 
+                                'eff_sub_2': 'RC Submission EFF', 
+                                'eff_sub_diff': 'Submission EFF DIFF', 
+                                'eff_sub_share': 'Submission EFF SHARE', 
+                                'off_grapp_1': 'BC Grappling Off',
+                                'off_grapp_2': 'RC Grappling Off',
+                                'off_grapp_diff': 'Grappling Off DIFF',
+                                'off_grapp_share': 'Grappling Off SHARE',
+                                'off_ko_1': 'BC KO',
+                                'off_ko_2': 'RC KO',
+                                'off_ko_diff': 'KO DIFF',
+                                'off_ko_share': 'KO SHARE',
+                                'off_strike_1': 'BC Strike Off',
+                                'off_strike_2': 'RC Strike Off',
+                                'off_strike_diff': 'Strike Off DIFF',
+                                'off_strike_share': 'Strike Off SHARE',
+                                'off_sub_1': 'BC Submission Off', 
+                                'off_sub_2': 'RC Submission Off', 
+                                'off_sub_diff': 'Submission Off DIFF', 
+                                'off_sub_share': 'Submission Off SHARE', 
+                                'prev_fights_1': 'BC Num Fights',
+                                'prev_fights_2': 'RC Num Fights',
+                                'rounds': 'Rounds'
+#             'def_ko_1': 'RC Chin',
+#             'def_ko_2': 'BC Chin',
+#             'def_ko_diff': 'Chin DIFF',
+#             'def_ko_share': 'Chin SHARE',
+#             'def_strike_1': 'BC Striking Def',
+#             'def_strike_2': 'RC Striking Def',
+#             'def_strike_diff': 'Striking Def DIFF',
+#             'def_strike_share': 'Striking Def SHARE',
+#             'eff_grap_1': 'BC Grappling EFF',
+#             'eff_grap_2': 'RC Grappling EFF',
+#             'eff_grap_diff': 'Grappling EFF DIFF',
+#             'eff_grap_share': 'Grappling EFF SHARE',
+#             'eff_ko_2': 'RC KO EFF',
+#             'eff_strike_1': 'BC Striking EFF',
+#             'eff_strike_2': 'RC Striking EFF',
+#             'eff_strike_diff': 'Striking EFF DIFF',
+#             'eff_strike_share': 'Striking EFF SHARE',
+#             'off_grapp_1': 'BC Grappling Off',
+#             'off_grapp_2': 'RC Grappling Off',
+#             'off_grapp_diff': 'Grappling Off DIFF',
+#             'off_grapp_share': 'Grappling Off SHARE',
+#             'off_ko_1': 'BC KO',
+#             'off_ko_diff': 'KO DIFF',
+#             'off_ko_share': 'KO SHARE',
+#             'off_strike_1': 'BC Strike Off',
+#             'off_strike_2': 'RC Strike Off',
+#             'off_strike_diff': 'Strike Off DIFF',
+#             'off_strike_share': 'Strike Off SHARE',       
         }
 
 
@@ -304,14 +353,21 @@ class ufc_engine:
 
     def get_ranking_for_wc_fighter(self, wc, fighterOid):
         try:
-            if (wc.upper() in self.weight_class_fighters.keys() and fighterOid in self.weight_class_fighters[wc].keys()):
-                resp = deepcopy(standard_get_response)
-                resp['response'] = self.weight_class_fighters[wc.upper()][fighterOid]
-                return resp
-            else:
+            if wc.upper() not in self.weight_class_fighters.keys():
                 resp = deepcopy(fail_response)
                 resp['errorMsg'] = '%s is not a supported weight class' % (wc)
                 return resp 
+            elif fighterOid not in self.weight_class_fighters[wc].keys():
+                print(self.weight_class_fighters[wc].keys())
+                print(wc)
+                print(fighterOid)
+                resp = deepcopy(fail_response)
+                resp['errorMsg'] = '%s is not a supported fighter' % (fighterOid)
+                return resp                 
+            else:
+                resp = deepcopy(standard_get_response)
+                resp['response'] = self.weight_class_fighters[wc.upper()][fighterOid]
+                return resp
         except Exception as e:
             print('Request failed with %s' % (e))
             resp = deepcopy(fail_response)
@@ -331,6 +387,7 @@ class ufc_engine:
             
             shap_values = self.explainer.shap_values(new_row)
             
+            print(list(new_row))
             columns, fighter_1_data, fighter_2_data = self._win_pred_graph_data(shap_values, new_row)
             
             fighter_1_data['name'] = bout_detail['fighterBoutXRefs'][0]['fighter']['fighterName']
@@ -405,7 +462,11 @@ class ufc_engine:
             fighter_1_data['data'].append(0)
             fighter_2_data['data'].append(conf)              
         return columns, fighter_1_data, fighter_2_data
-        
+      
+     
+#from spring.config import CONFIG
+#engine = ufc_engine(CONFIG['spring']['PW'])
+#engine.gen_win_pred_explainer('59eea37af7efb06c')
 #model = ufc_engine()
 #model._update_fight_list()
 #

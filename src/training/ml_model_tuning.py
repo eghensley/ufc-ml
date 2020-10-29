@@ -33,13 +33,13 @@ def _logRegTuning(x, y, post_feat = False, domain = 'strike'):
             score['id'] = model_id
             
             if post_feat:
-                with open('./training/ml/%s/post_feat/scores/%s.json' % (domain, model_id), 'w') as f:
+                with open('./src/training/ml/%s/post_feat/scores/%s.json' % (domain, model_id), 'w') as f:
                     json.dump(score, f)
-                dump(mod, "./training/ml/%s/post_feat/models/%s.joblib" % (domain, model_id)) 
+                dump(mod, "./src/training/ml/%s/post_feat/models/%s.joblib" % (domain, model_id)) 
             else:
-                with open('./training/ml/%s/pre_feat/scores/%s.json' % (domain, model_id), 'w') as f:
+                with open('./src/training/ml/%s/pre_feat/scores/%s.json' % (domain, model_id), 'w') as f:
                     json.dump(score, f)
-                dump(mod, "./training/ml/%s/pre_feat/models/%s.joblib" % (domain, model_id)) 
+                dump(mod, "./src/training/ml/%s/pre_feat/models/%s.joblib" % (domain, model_id)) 
        
 def _lgbTuning(x, y, post_feat = False, domain = 'strike', n_iter = 5000):
 #    param_grid = {'num_leaves': sp_randint(6, 50), 
@@ -94,13 +94,13 @@ def _lgbTuning(x, y, post_feat = False, domain = 'strike', n_iter = 5000):
         score['id'] = model_id
         
         if post_feat:
-            with open('./training/ml/%s/post_feat/scores/%s.json' % (domain, model_id), 'w') as f:
+            with open('./src/training/ml/%s/post_feat/scores/%s.json' % (domain, model_id), 'w') as f:
                 json.dump(score, f)
-            dump(mod, "./training/ml/%s/post_feat/models/%s.joblib" % (domain, model_id)) 
+            dump(mod, "./src/training/ml/%s/post_feat/models/%s.joblib" % (domain, model_id)) 
         else:
-            with open('./training/ml/%s/pre_feat/scores/%s.json' % (domain, model_id), 'w') as f:
+            with open('./src/training/ml/%s/pre_feat/scores/%s.json' % (domain, model_id), 'w') as f:
                 json.dump(score, f)
-            dump(mod, "./training/ml/%s/pre_feat/models/%s.joblib" % (domain, model_id)) 
+            dump(mod, "./src/training/ml/%s/pre_feat/models/%s.joblib" % (domain, model_id)) 
         progress(i+1, n_iter)
                 
 def _dartTuning(x, y, post_feat = False, domain = 'strike', n_iter = 5000):
@@ -156,13 +156,13 @@ def _dartTuning(x, y, post_feat = False, domain = 'strike', n_iter = 5000):
         score['id'] = model_id
         
         if post_feat:
-            with open('./training/ml/%s/post_feat/scores/%s.json' % (domain, model_id), 'w') as f:
+            with open('./src/training/ml/%s/post_feat/scores/%s.json' % (domain, model_id), 'w') as f:
                 json.dump(score, f)
-            dump(mod, "./training/ml/%s/post_feat/models/%s.joblib" % (domain, model_id)) 
+            dump(mod, "./src/training/ml/%s/post_feat/models/%s.joblib" % (domain, model_id)) 
         else:
-            with open('./training/ml/%s/pre_feat/scores/%s.json' % (domain, model_id), 'w') as f:
+            with open('./src/training/ml/%s/pre_feat/scores/%s.json' % (domain, model_id), 'w') as f:
                 json.dump(score, f)
-            dump(mod, "./training/ml/%s/pre_feat/models/%s.joblib" % (domain, model_id)) 
+            dump(mod, "./src/training/ml/%s/pre_feat/models/%s.joblib" % (domain, model_id)) 
         progress(i+1, n_iter)            
     
 #def _optimize_light_gbm():
@@ -178,13 +178,13 @@ def _opt_light(x, y, param, post_feat = False, domain = 'strike'):
     score['id'] = model_id
     
     if post_feat:
-        with open('./training/ml/%s/post_feat/scores/%s.json' % (domain, model_id), 'w') as f:
+        with open('./src/training/ml/%s/post_feat/scores/%s.json' % (domain, model_id), 'w') as f:
             json.dump(score, f)
-        dump(mod, "./training/ml/%s/post_feat/models/%s.joblib" % (domain, model_id)) 
+        dump(mod, "./src/training/ml/%s/post_feat/models/%s.joblib" % (domain, model_id)) 
     else:
-        with open('./training/ml/%s/pre_feat/scores/%s.json' % (domain, model_id), 'w') as f:
+        with open('./src/training/ml/%s/pre_feat/scores/%s.json' % (domain, model_id), 'w') as f:
             json.dump(score, f)
-        dump(mod, "./training/ml/%s/pre_feat/models/%s.joblib" % (domain, model_id))    
+        dump(mod, "./src/training/ml/%s/pre_feat/models/%s.joblib" % (domain, model_id))    
     return score['logloss']
 
 def _opt_dart(x, y, param, post_feat = False, domain = 'strike'):
@@ -195,13 +195,13 @@ def _opt_dart(x, y, param, post_feat = False, domain = 'strike'):
     score['id'] = model_id
     
     if post_feat:
-        with open('./training/ml/%s/post_feat/scores/%s.json' % (domain, model_id), 'w') as f:
+        with open('./src/training/ml/%s/post_feat/scores/%s.json' % (domain, model_id), 'w') as f:
             json.dump(score, f)
-        dump(mod, "./training/ml/%s/post_feat/models/%s.joblib" % (domain, model_id)) 
+        dump(mod, "./src/training/ml/%s/post_feat/models/%s.joblib" % (domain, model_id)) 
     else:
-        with open('./training/ml/%s/pre_feat/scores/%s.json' % (domain, model_id), 'w') as f:
+        with open('./src/training/ml/%s/pre_feat/scores/%s.json' % (domain, model_id), 'w') as f:
             json.dump(score, f)
-        dump(mod, "./training/ml/%s/pre_feat/models/%s.joblib" % (domain, model_id))    
+        dump(mod, "./src/training/ml/%s/pre_feat/models/%s.joblib" % (domain, model_id))    
     return score['logloss']
 
 def _opt_light_all_post(trial):

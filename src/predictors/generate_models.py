@@ -98,7 +98,7 @@ def _train_model(model, domain = 'strike'):
     x_train.set_index(Y.index, inplace = True)
     x_train.rename(columns = {i:j for i,j in zip(list(x_train), list(X))}, inplace = True)
     
-    dump(scale, 'predictors/%s/post_feat/trained_scale.joblib' % (domain))
+    dump(scale, 'src/predictors/%s/post_feat/trained_scale.joblib' % (domain))
     
     model.fit(x_train, Y)
     

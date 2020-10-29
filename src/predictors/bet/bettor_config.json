@@ -1,1 +1,0 @@
-{"model_id": "4e1c4251-de3d-4bc7-aafd-519ef0a0939a", "diff_ceiling": 0.21276098916255876, "diff_floor": 0.0055954182392820885, "prev_fight_floor": 4, "prev_fight_ceiling": 99, "bet_intercept": 0.37087827542170715, "conf_diff_lin": 0.4999624097809326, "conf_diff_quad": 0.4999415451937916, "num_fight_lin": 0, "num_fight_quad": 0, "standard_wager": 1}

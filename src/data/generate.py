@@ -34,7 +34,7 @@ def generate_year_data(year):
                 
     data = pd.DataFrame.from_dict(data_dict).T
     data.set_index('oid', inplace = True)
-    data.to_csv("data/raw_data/output_round_data_%s.csv" % (year))
+    data.to_csv("src/data/raw_data/output_round_data_%s.csv" % (year))
 
 def single_row_per_round(data):
     data['dupCol'] = data['boutOid'] + data['round'].astype(str)
@@ -62,7 +62,7 @@ def conv_stats_to_rate(data):
         data['def'+strike_col+'Successful'] = data['def'+strike_col+'Successful'] / data['seconds']
         data['off'+strike_col+'Attempted'] = data['off'+strike_col+'Attempted'] / data['seconds']
         data['def'+strike_col+'Attempted'] = data['def'+strike_col+'Attempted'] / data['seconds']        
-    for tech_col in ['Knockdowns', 'PassSuccessful', 'ReversalSuccessful', 'SubmissionAttempted']:
+    for tech_col in ['Knockdowns', 'ControlTime', 'ReversalSuccessful', 'SubmissionAttempted']:
         data['off'+tech_col] = data['off'+tech_col] / data['seconds']
         data['def'+tech_col] = data['def'+tech_col] / data['seconds']             
     return data
@@ -78,7 +78,7 @@ def add_share_cols(data, fill_zero = False):
         data['off'+strike_col+'AttemptedShare'].replace([np.inf, -np.inf], 0, inplace = True)
         data['off'+strike_col+'SuccessfulShare'].fillna(0, inplace = True)
         data['off'+strike_col+'AttemptedShare'].fillna(0, inplace = True)
-    for tech_col in ['Knockdowns', 'PassSuccessful', 'ReversalSuccessful', 'SubmissionAttempted']:
+    for tech_col in ['Knockdowns', 'ControlTime', 'ReversalSuccessful', 'SubmissionAttempted']:
         data['off'+tech_col+'Share'] = data['off'+tech_col] / (data['off'+tech_col] + data['def'+tech_col])
         data['off'+tech_col+'Share'].replace([np.inf, -np.inf], 0, inplace = True)
         data['off'+tech_col+'Share'].fillna(0, inplace = True)
@@ -92,16 +92,16 @@ def add_share_cols_new(data):
         data['off'+strike_col+'AttemptedShare'].replace([np.inf, -np.inf], 0, inplace = True)
         data['off'+strike_col+'SuccessfulShare'].fillna(0, inplace = True)
         data['off'+strike_col+'AttemptedShare'].fillna(0, inplace = True)
-    for tech_col in ['Knockdowns', 'PassSuccessful', 'ReversalSuccessful', 'SubmissionAttempted']:
+    for tech_col in ['Knockdowns', 'ControlTime', 'ReversalSuccessful', 'SubmissionAttempted']:
         data['off'+tech_col+'Share'] = (data['off'+tech_col] / (data['off'+tech_col] + data['def'+tech_col]).apply(lambda x: np.nan if x == 0 else x)).replace(np.nan, 0)
         data['off'+tech_col+'Share'].replace([np.inf, -np.inf], 0, inplace = True)
         data['off'+tech_col+'Share'].fillna(0, inplace = True)
     return data
         
 def pull_year_raw_training_data(year, norm_to_rate = True, add_share_feats = True, score = 'ko', drop_finishes = False, single_row = False, add_gender = False, add_class = False):
-    if not os.path.exists("data/raw_data/output_round_data_%s.csv" % (year)):
+    if not os.path.exists("src/data/raw_data/output_round_data_%s.csv" % (year)):     
         generate_year_data(year)
-    data = pd.read_csv("data/raw_data/output_round_data_%s.csv" % (year))
+    data = pd.read_csv("src/data/raw_data/output_round_data_%s.csv" % (year))
     data.set_index("oid", inplace = True)
     if (drop_finishes):
         data = data[data['finish'] != 1]
@@ -122,7 +122,10 @@ def pull_ml_training_corpus():
     for year in range(2005, 2020):
         year_data = pull_year_raw_training_data(year, score = 'finish', add_gender = True, add_class = True)
         data = data.append(year_data)
-    data = data[data['gender'] == 'M']
+    data = pd.get_dummies(data, columns=['gender'])
+    data = pd.get_dummies(data, columns=['class'])
+    data = pd.get_dummies(data, columns=['round'])
+    #data = data[data['gender'] == 'M']
     return data
 
 #   bout_id = '26173f6491300eaa'

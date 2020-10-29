@@ -7,8 +7,10 @@ Created on Fri May 15 11:09:36 2020
 """
 
 if __name__ == "__main__":
-    import sys
-    sys.path.append("..")
+    import sys, os
+    sys.path.append("src")
+    os.environ['ufc.flask.spring.host'] = 'http://localhost:4646'
+    os.environ['ufc.flask.spring.pw'] = '1234'
 
 import os
 from spring.api_wrappers import updateRanking, getAllBouts, refreshBout, getLastElo, updateElo, clearElo, getYearBouts, getBoutData
@@ -559,7 +561,7 @@ class elo_model:
         # self.bout_info = getBoutData(self.bout_oid)
         # print(self.bout_info)
         self.bout_info = refreshBout(self.bout_oid)
-        print(self.bout_info)
+#        print(self.bout_info)
 #        if self.bout_info['gender'] != 'MALE':
 #            if self.debug:
 #                print("Skipping bout %s.. not male" % (self.bout_info['oid']))
@@ -621,15 +623,15 @@ class elo_model:
             self.scores['acc'] = accuracy_score(testy, bin_pred)
             self.scores['cash'] = df['bet_outcome'].sum()
     
-            with open('./elo/scores/%s/%s.json' % (self.prefix, self.model_id), 'w') as f:
+            with open('src/elo/scores/%s/%s.json' % (self.prefix, self.model_id), 'w') as f:
                 json.dump(self.scores, f)
-            with open('./elo/models/%s/%s.json' % (self.prefix, self.model_id), 'w') as f:
+            with open('src/elo/models/%s/%s.json' % (self.prefix, self.model_id), 'w') as f:
                 json.dump(self.params, f)
         else:
 #            print(self.iter_scores)
-            with open('./elo/models/%s/%s.json' % (self.prefix, self.model_id), 'w') as f:
+            with open('src/elo/models/%s/%s.json' % (self.prefix, self.model_id), 'w') as f:
                 json.dump(self.params, f)
-            with open('./elo/scores/%s/%s.json' % (self.prefix, self.model_id), 'w') as f:
+            with open('src/elo/scores/%s/%s.json' % (self.prefix, self.model_id), 'w') as f:
                 json.dump(self.iter_scores, f)
             gross_scores = []
             for k,v in self.iter_scores.items():
@@ -926,6 +928,8 @@ def optimize_elo(domain, trials = 300):
     
     
 def _opt_test():
+    
+#    clearElo()
     params = {}
     potential_params = {
         'ko_finish_damper': np.linspace(.05, .95, 10),
@@ -935,7 +939,7 @@ def _opt_test():
     
     for k,v in potential_params.items():
         params[k] = random.choice(v)
-    params['elo_n_sims'] = 500
+    params['elo_n_sims'] = 1
     BOUTS = getAllBouts()
     elo_mod = elo_model(cache = True,
                             debug = True,
@@ -949,6 +953,7 @@ def _opt_test():
                             sim = False
                             )
     elo_mod.train(BOUTS)
+    bout_info = refreshBout('d781ee8ef1a4bb65')
     
     elo_mod.fighter_db
     elo_mod.fighters

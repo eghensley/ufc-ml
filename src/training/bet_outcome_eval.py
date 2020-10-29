@@ -6,7 +6,14 @@ Created on Mon Mar 23 01:12:08 2020
 @author: eric.hensleyibm.com
 """
 
-   
+import sys, os
+if __name__ == "__main__":
+    sys.path.append("src")
+    os.environ['ufc.flask.spring.host'] = 'http://192.168.1.64:4646'#'http://68.248.220.199:4646'
+    os.environ['ufc.flask.spring.pw'] = '1234'
+
+    print(os.environ)
+    
 import numpy as np
 np.random.seed(1108)
 from utils.general import calcWinnings
@@ -70,27 +77,27 @@ class bet_eval:
 
     def _wager_funct(self, conf_diff, f1_num, f2_num):
         
-        print(conf_diff)
-        print(f1_num)
-        print(f2_num)
-
-        conf_diff_lin_comp = self.conf_diff_lin * conf_diff
-        conf_diff_quad_comp = self.conf_diff_quad * (conf_diff**2)
-        f1_num_fight_lin_comp = self.num_fight_lin * f1_num * 2
-        f2_num_fight_lin_comp = self.num_fight_lin * f2_num * 2
-        f1_num_fight_quad_comp = (f1_num**2) * self.num_fight_quad * 2
-        f2_num_fight_quad_comp = (f2_num**2) * self.num_fight_quad * 2
-        
-        print(conf_diff_lin_comp)
-        print(conf_diff_quad_comp)
-        print(f1_num_fight_lin_comp)
-        print(f2_num_fight_lin_comp)
-        print(f1_num_fight_quad_comp)
-        print(f2_num_fight_quad_comp)
-        print(self.bet_intercept + conf_diff_lin_comp + conf_diff_quad_comp + f1_num_fight_lin_comp + f2_num_fight_lin_comp + f1_num_fight_quad_comp + f2_num_fight_quad_comp)
+#        print(conf_diff)
+#        print(f1_num)
+#        print(f2_num)
+#
+#        conf_diff_lin_comp = self.conf_diff_lin * conf_diff
+#        conf_diff_quad_comp = self.conf_diff_quad * (conf_diff**2)
+#        f1_num_fight_lin_comp = self.num_fight_lin * f1_num * 2
+#        f2_num_fight_lin_comp = self.num_fight_lin * f2_num * 2
+#        f1_num_fight_quad_comp = (f1_num**2) * self.num_fight_quad * 2
+#        f2_num_fight_quad_comp = (f2_num**2) * self.num_fight_quad * 2
+#        
+#        print(conf_diff_lin_comp)
+#        print(conf_diff_quad_comp)
+#        print(f1_num_fight_lin_comp)
+#        print(f2_num_fight_lin_comp)
+#        print(f1_num_fight_quad_comp)
+#        print(f2_num_fight_quad_comp)
+#        print(self.bet_intercept + conf_diff_lin_comp + conf_diff_quad_comp + f1_num_fight_lin_comp + f2_num_fight_lin_comp + f1_num_fight_quad_comp + f2_num_fight_quad_comp)
         bet_mult = self.bet_intercept + (self.conf_diff_lin * conf_diff) + (self.conf_diff_quad * (conf_diff**2)) + (self.num_fight_lin * f1_num) + (self.num_fight_quad * (f1_num**2)) + (self.num_fight_lin * f2_num) + (self.num_fight_quad * (f2_num**2)) + (f1_num * self.num_fight_lin) + ((f1_num**2) * self.num_fight_quad) + (f2_num * self.num_fight_lin) + ((f2_num**2) * self.num_fight_quad)
         to_wager = bet_mult * self.standard_wager
-        print(to_wager)
+#        print(to_wager)
 #        print("%s + (%s * %s) + (%s * (%s**2)) + (%s * %s) + (%s * (%s**2)) + (%s * %s) + (%s * (%s**2)))" % (self.bet_intercept, self.conf_diff_lin, conf_diff, self.conf_diff_quad, conf_diff, self.num_fight_lin, f1_num, self.num_fight_quad, f1_num, self.num_fight_lin, f2_num, self.num_fight_quad, f2_num))
 #        print("$%s" % (to_wager))
         if to_wager < 0:
@@ -117,7 +124,6 @@ class bet_eval:
         else:
             if self.debug:
                 print('OUTCOME - skipping bout as outcome = %s' % (fbx['outcome']))
-            dafdasfa
             
     def _predict(self, f, fbx):
         if fbx['expOdds'] is None:
@@ -271,14 +277,14 @@ class bet_eval:
             print(score)
         if save_results:
             if validate:
-                with open('./training/bet/validation/scores/%s.json' % (self.model_id), 'w') as f:
+                with open('src/training/bet/validation/scores/%s.json' % (self.model_id), 'w') as f:
                     json.dump(score, f)
-                with open('./training/bet/validation/models/%s.json' % (self.model_id), 'w') as p:
+                with open('src/training/bet/validation/models/%s.json' % (self.model_id), 'w') as p:
                     json.dump(self.params, p)                 
             else:
-                with open('./training/bet/scores/%s.json' % (self.model_id), 'w') as f:
+                with open('src/training/bet/scores/%s.json' % (self.model_id), 'w') as f:
                     json.dump(score, f)
-                with open('./training/bet/models/%s.json' % (self.model_id), 'w') as p:
+                with open('src/training/bet/models/%s.json' % (self.model_id), 'w') as p:
                     json.dump(self.params, p)   
         if full_score:
             return score
@@ -296,41 +302,82 @@ class bet_eval:
             self._proc_bout(bout_detail['boutId'])      
         return self._predictions
         
-#fights =   ['fc9a9559a05f2704',
-#            '33b2f68ef95252e0',
-#            '5df17b3620145578',
-#            'b26d3e3746fb4024',
-#            '44aa652b181bcf68',
-#            '0c1773639c795466',
-#            "dfb965c9824425db",
-#            "5f8e00c27b7e7410",
-#            "898337ef520fe4d3",
-#            "53278852bcd91e11",
-#            "0b5b6876c2a4723f",
-#            "c32eab6c2119e989",
-#            "2eab7a6c8b0ed8cc",
-#            "1e13936d708bcff7",
-#            "4c12aa7ca246e7a4",
-#            "14b9e0f2679a2205"]
-#import random
-#random.shuffle(fights)
-#
-#['c32eab6c2119e989',
+#fights = getTrainingFights(2020)
+#fights =   ['0c1773639c795466',
+# '44aa652b181bcf68',
+# 'b26d3e3746fb4024',
+# '5df17b3620145578',
+# '33b2f68ef95252e0',
+# 'fc9a9559a05f2704',
 # '0b5b6876c2a4723f',
+# '53278852bcd91e11',
+# '898337ef520fe4d3',
+# '5f8e00c27b7e7410',
+# 'dfb965c9824425db',
+# '14b9e0f2679a2205',
+# '4c12aa7ca246e7a4',
 # '1e13936d708bcff7',
 # '2eab7a6c8b0ed8cc',
-# '5df17b3620145578',
-# '44aa652b181bcf68',
-# '5f8e00c27b7e7410',
-# '898337ef520fe4d3',
-# '53278852bcd91e11',
-# '4c12aa7ca246e7a4',
-# '14b9e0f2679a2205',
+# 'c32eab6c2119e989',
+# 'dbd198f780286aca',
+# '18f5669a92e99d92',
+# 'ddbd0d6259ce57cc',
+# 'dde70a112e053a6c',
+# '3746e21bb508391a',
+# '7a82635ffa9b59fe',
+# 'bda04c573563cc2e',
+# 'af1e5c64b8663aa0',
+# 'e29cf523ebd155c5',
+# '542db012217ecb83',
+# '9c37681096c6f3a9',
+# '831b937811804dad',
+# 'e69c5ce12f4e762b',
+# '805ad1801eb26abb',
+# 'fd4578cac86d75ca',
+# 'd4f364dd076bb0e2',
+# 'c3c38c86f5ab9b5c']
+#val_fights = [
+#"c3c38c86f5ab9b5c",
+#"d4f364dd076bb0e2",
+#"fd4578cac86d75ca",
+#"805ad1801eb26abb",
+#"e69c5ce12f4e762b"
+#        ]
+#fights = [i for i in fights if i not in val_fights]
+#
+#import random
+#random.shuffle(fights)
+
+#test_fights = fights[:14]
+#['e29cf523ebd155c5',
 # 'fc9a9559a05f2704',
-# '0c1773639c795466',
+# '53278852bcd91e11',
 # 'b26d3e3746fb4024',
 # '33b2f68ef95252e0',
-# 'dfb965c9824425db']
+# 'c32eab6c2119e989',
+# '5df17b3620145578',
+# '542db012217ecb83',
+# '14b9e0f2679a2205',
+# 'bda04c573563cc2e',
+# '898337ef520fe4d3',
+# 'dfb965c9824425db',
+# 'ddbd0d6259ce57cc',
+# 'dde70a112e053a6c']
+#train_fights = fights[14:]
+#['4c12aa7ca246e7a4',
+# '0c1773639c795466',
+# '18f5669a92e99d92',
+# '44aa652b181bcf68',
+# '1e13936d708bcff7',
+# '831b937811804dad',
+# '5f8e00c27b7e7410',
+# '3746e21bb508391a',
+# 'af1e5c64b8663aa0',
+# '0b5b6876c2a4723f',
+# '2eab7a6c8b0ed8cc',
+# 'dbd198f780286aca',
+# '9c37681096c6f3a9',
+# '7a82635ffa9b59fe']
 
 
 def _opt_betting(trial):
@@ -362,17 +409,23 @@ def _opt_betting(trial):
                       bet_female = param['bet_female']
                       )
     
-    return better.evaluate(fight_list = ['c32eab6c2119e989',
-                                         '0b5b6876c2a4723f',
-                                         '1e13936d708bcff7',
-                                         '2eab7a6c8b0ed8cc',
-                                         '5df17b3620145578',
+    return better.evaluate(fight_list = ['4c12aa7ca246e7a4',
+                                         '0c1773639c795466',
+                                         '18f5669a92e99d92',
                                          '44aa652b181bcf68',
+                                         '1e13936d708bcff7',
+                                         '831b937811804dad',
                                          '5f8e00c27b7e7410',
-                                         '898337ef520fe4d3']
+                                         '3746e21bb508391a',
+                                         'af1e5c64b8663aa0',
+                                         '0b5b6876c2a4723f',
+                                         '2eab7a6c8b0ed8cc',
+                                         'dbd198f780286aca',
+                                         '9c37681096c6f3a9',
+                                         '7a82635ffa9b59fe']
                             )    
     
-def optimize_bet(clf = 'light', domain = 'strike', trials = 2000):
+def optimize_bet(clf = 'light', domain = 'strike', trials = 5000):
     study = optuna.create_study(direction='maximize')
     study.optimize(_opt_betting, n_trials=trials)      
     print('Number of finished trials:', len(study.trials))
@@ -408,16 +461,16 @@ def gen_score_report():
 #    domain = 'strike'
     all_scores = {'average':[], 'gross':[]}
         
-    onlyfiles = [f for f in listdir("training/bet/scores") if isfile(join("training/bet/scores", f))]
+    onlyfiles = [f for f in listdir("src/training/bet/scores") if isfile(join("src/training/bet/scores", f))]
     for file in onlyfiles:
-        with open('training/bet/scores/%s'% (file)) as f:
+        with open('src/training/bet/scores/%s'% (file)) as f:
             data = json.load(f)
         all_scores['average'].append(data['average'])
         all_scores['gross'].append(data['gross'])
                 
     ranked_scores = {}
     for file in onlyfiles:
-        with open('training/bet/scores/%s'% (file)) as f:
+        with open('src/training/bet/scores/%s'% (file)) as f:
             data = json.load(f)
         idx = data['model_id']
         score = {}
@@ -439,7 +492,7 @@ def gen_score_report():
             
             val_score = {}
             
-            with open('training/bet/models/%s.json'% (idx)) as f:
+            with open('src/training/bet/models/%s.json'% (idx)) as f:
                 param = json.load(f)
                 
             better = bet_eval(debug = True,
@@ -456,14 +509,20 @@ def gen_score_report():
                       bet_female = param['bet_female']
                               )
             res = better.evaluate(full_score = True, 
-                                  fight_list = ['53278852bcd91e11',
-                                                 '4c12aa7ca246e7a4',
-                                                 '14b9e0f2679a2205',
+                                  fight_list = ['e29cf523ebd155c5',
                                                  'fc9a9559a05f2704',
-                                                 '0c1773639c795466',
+                                                 '53278852bcd91e11',
                                                  'b26d3e3746fb4024',
                                                  '33b2f68ef95252e0',
-                                                 'dfb965c9824425db'],
+                                                 'c32eab6c2119e989',
+                                                 '5df17b3620145578',
+                                                 '542db012217ecb83',
+                                                 '14b9e0f2679a2205',
+                                                 'bda04c573563cc2e',
+                                                 '898337ef520fe4d3',
+                                                 'dfb965c9824425db',
+                                                 'ddbd0d6259ce57cc',
+                                                 'dde70a112e053a6c'],
                                     save_results = False,
                                     validate = True
                                     )  
@@ -480,9 +539,9 @@ def gen_score_report():
 
     pos_models = {}
     for pos_score in pos_scores_ids:
-        with open('training/bet/models/%s.json'% (pos_score)) as f:
+        with open('src/training/bet/models/%s.json'% (pos_score)) as f:
             mod = json.load(f)
-        with open('training/bet/scores/%s.json'% (pos_score)) as f:
+        with open('src/training/bet/scores/%s.json'% (pos_score)) as f:
             score = json.load(f)        
         score['average_rank'] = percentileofscore(all_scores['average'], score['average'], 'rank')
         score['gross_rank'] = percentileofscore(all_scores['gross'], score['gross'], 'rank') 
@@ -498,35 +557,39 @@ def gen_score_report():
         mod['tot_val_rank'] = mod['val_average_rank'] + mod['val_gross_rank']
         pos_models[pos_score] = mod
         
-    with open('betting_model_params_new.json', 'w') as b:
+    with open('src/betting_model_params_new.json', 'w') as b:
         json.dump(pos_models, b)
     pos_models_df = pd.DataFrame.from_dict(pos_models).T
-    pos_models_df.to_csv("betting_model_params_new.csv")
+    pos_models_df.to_csv("src/betting_model_params_new.csv")
     
 
 def val_fights():
     results = {}
-    for file in ['f140b52a-41de-4d75-b27e-113c67da1e03',
-                'adf467c4-3e84-418f-997f-53a93bfa62bb',
-                'da487a00-1f4e-4877-bdb3-0a9f95fd848a',
-                'f3f53f15-b612-452f-90d8-b794164b3df8',
-                'e4376d9a-7ee0-47ca-8d7f-c9d72ad69570',
-                '47a56773-2665-495e-8e41-505755d38f6a',
-                '0f1a2c8a-ce31-4ca6-bb74-5f6131f3a5ad',
-                '208e43c2-5a51-49ab-aa7d-a4ab52048d92',
-                '4d7143ce-831d-4c17-ba4f-6cb538ad81be',
-                'c45192e0-2eda-490b-bd54-5e287841256e',
-                '237cbd73-1582-4418-bed1-592380086047',
-                '0d3987a1-b5bb-4a7e-911d-7de76e6b979c',
-                '3d4e12f3-beb5-4f12-948e-bda58ea03481',
-                '5671e0a2-de11-43e0-8a50-67eaedc3113a',
-                '08e0c5c7-4fb6-4130-a723-2fa0bd4a9bc7',
-                'e9589935-4fab-4a75-a0cd-a8cc645d4384',
-                'a966423a-dace-4901-8301-c597936c9ee8',
-                '1c370556-5b27-4a66-a625-6ff42ef3cbe2',
-                '760b2643-6a0f-4781-908d-10482e670bcc',
-                '7cc9c001-7f8f-41af-866a-d44248e40a17']:
-        with open('training/bet/models/%s.json' % (file), 'r') as r:
+    for file in ['ebab23ef-11a3-4e5a-90fa-af107661dda0',
+                '4d8443ff-65af-440d-973b-a009116efdd8',
+                '11e7d3a5-eebd-485b-8fb9-6b0c8cc09d9c',
+                'd9a5ea77-5715-433c-945b-e060c82468f7',
+                '4c71e947-2185-439f-b044-0b9c5fad1ca5',
+                '90b7e07b-dd7b-42ec-b73b-9497077fb0ae',
+                '10d7f9ec-d79a-479a-a397-410c6276b11e',
+                '7dc50b87-84af-462f-8939-69d88417be7b',
+                '170a4c24-1bee-48f6-91cf-dbbe82711c67',
+                'f733b0d5-d516-478d-82da-eacec7dbc8ab',
+                '9dcee953-84ef-415f-80a8-ed8e736cda7d',
+                'fa2c06ef-0e1d-4b5b-9260-e3da50cfafa0',
+                'f692aef2-fd4f-4074-87b2-010b1cff767a',
+                '12de8fc5-d3df-4e43-8824-53b3ea4bd908',
+                '981a1214-15d1-4214-b180-2711f97c66d3',
+                '87424177-05cd-4427-b60e-1a5461bebf22',
+                'abde0e96-4ca2-401e-9095-046a328fffbc',
+                '5f353ef0-289e-449b-a635-e29c6e026e3d',
+                'a0f2a2ae-b5ac-4420-a487-eb03805a6bd2',
+                'a77925c9-6ee6-41bb-b357-b3e5992c11bb',
+                '67e2b251-4878-4c8d-bd19-e9f6780b657c',
+                '82087aa8-8db1-4b05-b3b5-7359ff821e68',
+                '0cb9f260-32af-403c-9f57-1b8adaa3ff3a'
+                ]:
+        with open('src/training/bet/models/%s.json' % (file), 'r') as r:
             param = json.load(r)    
         bettor = bet_eval(debug = True,
                           conf_diff_lin = param['conf_diff_lin'],
@@ -542,20 +605,21 @@ def val_fights():
                           bet_female = param['bet_female']
                           )      
         res = bettor.evaluate(full_score = True, 
-                              fight_list = ["dbd198f780286aca",
-                                            "c32eab6c2119e989",
-                                            "2eab7a6c8b0ed8cc"
-                                            ],
+                              fight_list = [#'c3c38c86f5ab9b5c',
+                                             'd4f364dd076bb0e2',
+                                             'fd4578cac86d75ca',
+                                             '805ad1801eb26abb',
+                                             'e69c5ce12f4e762b'],
                                 save_results = False,
                                 validate = True
                                 )    
         results[file] = res
-    with open('new_validation_results.json', 'w') as b:
+    with open('src/new_validation_results.json', 'w') as b:
         json.dump(results, b)    
 
 
 def validate_new_fights():
-    with open('predictors/bet/bettor_config_new.json', 'r') as r:
+    with open('src/predictors/bet/bettor_config_new.json', 'r') as r:
         param = json.load(r)    
     bettor = bet_eval(debug = True,
                       conf_diff_lin = param['conf_diff_lin'],
@@ -627,15 +691,15 @@ def validate_new_fights():
 #    fight_id = 'dbd198f780286aca'
     
 def add_best_model():
-    best_model_id = '4e1c4251-de3d-4bc7-aafd-519ef0a0939a'
-    with open('training/bet/models/%s.json'% (best_model_id)) as f:
+    best_model_id = 'fa2c06ef-0e1d-4b5b-9260-e3da50cfafa0'
+    with open('src/training/bet/models/%s.json'% (best_model_id)) as f:
         mod = json.load(f)    
-    with open('predictors/bet/bettor_config.json', 'w') as w:
+    with open('src/predictors/bet/bettor_config.json', 'w') as w:
         json.dump(mod, w)
     
 #    fight_id = '3746e21bb508391a'
 def predict_bet_winners(fight_id):
-    with open('predictors/bet/bettor_config_new.json', 'r') as r:
+    with open('src/predictors/bet/bettor_config_new.json', 'r') as r:
         param = json.load(r)    
     bettor = bet_eval(debug = True,
                       conf_diff_lin = param['conf_diff_lin'],

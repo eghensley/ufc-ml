@@ -43,7 +43,7 @@ def _feat_reduction(x, y, domain = 'strike', refit = False):
     print('Best features :', x.columns[feature_search.support_])   
     
     best_feats = {'features': list(x.columns[feature_search.support_])}
-    with open('predictors/%s/opt.json' % (domain), 'w') as f:
+    with open('src/predictors/%s/opt.json' % (domain), 'w') as f:
         json.dump(best_feats, f)
         
 def retrieve_reduced_domain_features(domain = 'strike', refit = False):
@@ -76,12 +76,12 @@ def form_to_domain(domain = 'strike'):
         df = reduce_mem_usage(df)
         df = df.sample(frac=1, random_state = 1108)
         if domain == 'strike':
-            df = df[df['round'] == 1]
+            df = df[df['round_1'] == 1]
             x = df[raw_features['features']['strike']['x']]
             y = df[raw_features['features']['strike']['y']]
             return x, y
         elif domain == 'grapp':
-            df = df[(df['round'] == 2) | (df['round'] ==3)]
+            df = df[(df['round_2'] == 1) | (df['round_3'] == 1)]
             x = df[raw_features['features']['grapp']['x']]
             y = df[raw_features['features']['grapp']['y']]
             return x, y    
@@ -91,9 +91,9 @@ def retrieve_best_model(domain = 'strike', post_feat = False, refit = False):
         feat = 'post'
     else:
         feat = 'pre'
-    if not os.path.exists('predictors/%s/%s_feat/model.joblib' % (domain, feat)) or refit:
+    if not os.path.exists('src/predictors/%s/%s_feat/model.joblib' % (domain, feat)) or refit:
         add_best_model(domain = domain, post_feat = post_feat)
-    mod = load('predictors/%s/%s_feat/model.joblib' % (domain, feat))
+    mod = load('src/predictors/%s/%s_feat/model.joblib' % (domain, feat))
     return mod
 
 def add_best_model(domain = 'strike', post_feat = False):
@@ -101,7 +101,7 @@ def add_best_model(domain = 'strike', post_feat = False):
         feat = 'post'
     else:
         feat = 'pre'
-    mypath = 'training/ml/%s/%s_feat/scores' % (domain, feat)
+    mypath = 'src/training/ml/%s/%s_feat/scores' % (domain, feat)
     
     
     onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
@@ -134,9 +134,9 @@ def add_best_model(domain = 'strike', post_feat = False):
     ranked_score_df['tot'] = ranked_score_df['logloss'] + ranked_score_df['f1'] + ranked_score_df['roc'] + ranked_score_df['acc']
     ranked_score_df.sort_values(by=['tot'], ascending = False, inplace = True)
     best_model_id = ranked_score_df.index[0]
-    best_model = load('training/ml/%s/%s_feat/models/%s.joblib' % (domain, feat, best_model_id))
+    best_model = load('src/training/ml/%s/%s_feat/models/%s.joblib' % (domain, feat, best_model_id))
     
-    dump(best_model, 'predictors/%s/%s_feat/model.joblib' % (domain, feat))
+    dump(best_model, 'src/predictors/%s/%s_feat/model.joblib' % (domain, feat))
     return best_model
 
 def _single_core_scorer(input_vals):

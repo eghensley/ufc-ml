@@ -5,28 +5,34 @@ Created on Tue May 12 18:28:04 2020
 
 @author: ehens86
 """
+import sys, os
+if __name__ == "__main__":
+    sys.path.append("src")
+    os.environ['ufc.flask.spring.host'] = 'http://localhost:4646'
+    os.environ['ufc.flask.spring.pw'] = '1234'
 
-#from training import tune_ml, fill_ml_training_scores, optimize_bet, predict_bet_winners, gen_score_report, val_fights
-#from elo import optimize_elo, populate_elo
-#from db import pop_future_bouts, pop_year_bouts, update_mybookie
+    print(os.environ)
+from training import tune_ml, fill_ml_training_scores, optimize_bet, predict_bet_winners, gen_score_report, val_fights
+from elo import optimize_elo, populate_elo
+from db import pop_future_bouts, pop_year_bouts, update_mybookie
 #
 ##val_fights()
-#optimize_bet(trials = 2000)
+#optimize_bet(trials = 5000)
 #gen_score_report()
-
+val_fights()
 #pop_year_bouts()
 
 
 
-#import argparse
-## fix ufc odds from 6-6
+import argparse
+# fix ufc odds from 6-6
 #FIGHT_ID = '1e13936d708bcff7'
-#
-#valid_pos_args = ['TRAIN', 'FULL_TRAIN', 'DB', 'PRED']
-#valid_domains = ['STRIKE', 'GRAPP', 'KO', 'SUB', 'ALL', 'BET', 'ODDS']
-#valid_models = ['LOG', 'LIGHT', 'DART']
-#valid_dims = ['ML', 'ELO', 'BET']
-#
+
+valid_pos_args = ['TRAIN', 'FULL_TRAIN', 'DB', 'PRED']
+valid_domains = ['STRIKE', 'GRAPP', 'KO', 'SUB', 'ALL', 'BET', 'ODDS']
+valid_models = ['LOG', 'LIGHT', 'DART']
+valid_dims = ['ML', 'ELO', 'BET']
+
 #def db_update(args):
 #    if args.domain is None:
 #        if args.year is None:
@@ -48,30 +54,31 @@ Created on Tue May 12 18:28:04 2020
 #        
 #def bet_evaluation(args):
 #    predict_bet_winners(FIGHT_ID)
-#    
-#def full_train(args):
-#    
+    
+def full_train():
+    
 #    if args.iter is None:
-#        n_iter = 5000
+    n_iter = 5000
+#    n_iter = 10
 #    else:
 #        n_iter = int(args.iter)
 #        
 #    if args.refit is None:
-#        refit = False
+    refit = False
 #    else:
 #        refit = args.refit
-#
+
 #    tune_ml(clf = 'log', domain = 'strike', refit = refit, post_feat = False, opt = False, trials = n_iter)
 #    tune_ml(clf = 'log', domain = 'grapp', refit = refit, post_feat = False, opt = False,  trials = n_iter)
 #    tune_ml(clf = 'light', domain = 'strike', refit = refit, post_feat = False, opt = False,  trials = n_iter)
 #    tune_ml(clf = 'light', domain = 'grapp', refit = refit, post_feat = False, opt = False,  trials = n_iter)    
-#    
+    
 #    tune_ml(clf = 'log', domain = 'strike', refit = refit, post_feat = True, opt = False,  trials = n_iter)
 #    tune_ml(clf = 'log', domain = 'grapp', refit = refit, post_feat = True, opt = False,  trials = n_iter)
-#    tune_ml(clf = 'light', domain = 'strike', refit = refit, post_feat = True, opt = True,  trials = int(n_iter/4))
-#    tune_ml(clf = 'light', domain = 'grapp', refit = refit, post_feat = True, opt = True,  trials = int(n_iter/4))       
-#    tune_ml(clf = 'dart', domain = 'strike', refit = refit, post_feat = True, opt = True,  trials = int(n_iter/4))
-#    tune_ml(clf = 'dart', domain = 'grapp', refit = refit, post_feat = True, opt = True,  trials = int(n_iter/4))   
+#    tune_ml(clf = 'light', domain = 'strike', refit = refit, post_feat = True, opt = True,  trials = int(n_iter))
+#    tune_ml(clf = 'light', domain = 'grapp', refit = refit, post_feat = True, opt = True,  trials = int(n_iter))       
+#    tune_ml(clf = 'dart', domain = 'strike', refit = refit, post_feat = True, opt = True,  trials = int(70))
+#    tune_ml(clf = 'dart', domain = 'grapp', refit = refit, post_feat = True, opt = True,  trials = int(2000))   
 #    
 #    fill_ml_training_scores()
 #    
@@ -83,46 +90,47 @@ Created on Tue May 12 18:28:04 2020
 #    populate_elo(refit = True)
 #    
 #    tune_ml(clf = 'log', domain = 'all', refit = refit, post_feat = False, opt = False,  trials = n_iter)
-#    tune_ml(clf = 'light', domain = 'all', refit = refit, post_feat = False, opt = False,  trials = int(n_iter/2))
+#    tune_ml(clf = 'light', domain = 'all', refit = refit, post_feat = False, opt = False,  trials = int(n_iter))
 #    tune_ml(clf = 'dart', domain = 'all', refit = refit, post_feat = False, opt = False,  trials = n_iter)
-##    
+#    
 #    tune_ml(clf = 'log', domain = 'all', refit = refit, post_feat = True, opt = False,  trials = n_iter)
-#    tune_ml(clf = 'light', domain = 'all', refit = refit, post_feat = True, opt = True,  trials = int(n_iter/4))
-#    tune_ml(clf = 'dart', domain = 'all', refit = refit, post_feat = True, opt = True,  trials = int(n_iter/4))
-#
-#def train(args):
-#    funct_domain = 'strike'
-#    funct_model = 'log'
-#
-#    if args.iter is None:
-#        n_iter = 5000
-#    else:
-#        n_iter = int(args.iter)
-#        
-#    if args.domain is None:
-#        print("No domain specified.. defaulting to STRIKE")
-#    elif args.domain.upper() not in valid_domains:
-#        raise ValueError("%s is not a valid domain" % (args.domain))
-#    else:
-#        funct_domain = args.domain.lower()
-#        
-#    if args.db and args.refit:
-#        fill_ml_training_scores()
-#    else:
-#        if args.dim.upper() == 'ELO':
-#            optimize_elo(funct_domain)
-#        elif args.dim.upper() == 'BET':
-#            optimize_bet(trials = n_iter)
-#        else:        
-#            if args.model is None:
-#                print("No model specified.. defaulting to log")
-#            elif args.model.upper() not in valid_models:
-#                raise ValueError("%s is not a valid domain" % (args.domain))
-#            else:
-#                funct_model = args.model.lower()
-#                
-#            tune_ml(clf = funct_model, domain = funct_domain, refit = args.refit, post_feat = args.post, opt = args.opt)
-#
+#    tune_ml(clf = 'light', domain = 'all', refit = refit, post_feat = True, opt = True,  trials = int(n_iter))
+#    tune_ml(clf = 'dart', domain = 'all', refit = refit, post_feat = True, opt = True,  trials = int(n_iter))
+
+def train(args):
+    funct_domain = 'strike'
+    funct_model = 'log'
+
+    if args.iter is None:
+        n_iter = 5000
+    else:
+        n_iter = int(args.iter)
+        
+    if args.domain is None:
+        print("No domain specified.. defaulting to STRIKE")
+    elif args.domain.upper() not in valid_domains:
+        raise ValueError("%s is not a valid domain" % (args.domain))
+    else:
+        funct_domain = args.domain.lower()
+        
+    if args.db and args.refit:
+        fill_ml_training_scores()
+    else:
+        if args.dim.upper() == 'ELO':
+            optimize_elo(funct_domain)
+        elif args.dim.upper() == 'BET':
+            optimize_bet(trials = n_iter)
+        else:        
+            if args.model is None:
+                print("No model specified.. defaulting to log")
+            elif args.model.upper() not in valid_models:
+                raise ValueError("%s is not a valid domain" % (args.domain))
+            else:
+                funct_model = args.model.lower()
+                
+            tune_ml(clf = funct_model, domain = funct_domain, refit = args.refit, post_feat = args.post, opt = args.opt)
+
+#full_train()
 #if __name__ == '__main__':
 #    # Instantiate the parser
 #    parser = argparse.ArgumentParser(description='UFC Prediction Engine')
@@ -194,8 +202,8 @@ Created on Tue May 12 18:28:04 2020
 #        train(args)
 #    elif args.pos_arg.upper() == 'FULL_TRAIN':
 #        full_train(args)
-#    elif args.pos_arg.upper() == 'DB':
-#        db_update(args)
-#    elif args.pos_arg.upper() == 'PRED':
-#        bet_evaluation(args)
-#        
+##    elif args.pos_arg.upper() == 'DB':
+##        db_update(args)
+##    elif args.pos_arg.upper() == 'PRED':
+##        bet_evaluation(args)
+##        
