@@ -169,6 +169,7 @@ class ufc_engine:
             print('initializing %s' % (wc))
             self.weight_class_rankings[wc], self.weight_class_fighters[wc] = calc_rankings_for_wc(wc)
             print('initialized %s' % (wc))
+
         self.label_translator = {
                                 "age_1": "BC Age",
                                 'age_2': 'RC Age',
@@ -253,7 +254,6 @@ class ufc_engine:
 #             'off_strike_diff': 'Strike Off DIFF',
 #             'off_strike_share': 'Strike Off SHARE',       
         }
-
 
         print('retrieve_best_trained_models - loading best model')
         mod = load('src/predictors/all/post_feat/trained_model.joblib')
@@ -451,7 +451,7 @@ class ufc_engine:
                 fighter_1_data['data'].append(0)
                 fighter_2_data['data'].append(effect)
                 
-            conf = new_conf
+            # conf = new_conf
             columns.append(j)
         
         columns.append('Total')
