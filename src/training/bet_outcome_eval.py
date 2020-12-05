@@ -422,7 +422,9 @@ def _opt_betting(trial):
                                          '2eab7a6c8b0ed8cc',
                                          'dbd198f780286aca',
                                          '9c37681096c6f3a9',
-                                         '7a82635ffa9b59fe']
+                                         '7a82635ffa9b59fe',
+                                         'd4f364dd076bb0e2',
+                                         'fd4578cac86d75ca']
                             )    
     
 def optimize_bet(clf = 'light', domain = 'strike', trials = 5000):
@@ -522,7 +524,9 @@ def gen_score_report():
                                                  '898337ef520fe4d3',
                                                  'dfb965c9824425db',
                                                  'ddbd0d6259ce57cc',
-                                                 'dde70a112e053a6c'],
+                                                 'dde70a112e053a6c',
+                                                 '805ad1801eb26abb',
+                                                 'e69c5ce12f4e762b'],
                                     save_results = False,
                                     validate = True
                                     )  
@@ -565,29 +569,55 @@ def gen_score_report():
 
 def val_fights():
     results = {}
-    for file in ['ebab23ef-11a3-4e5a-90fa-af107661dda0',
-                '4d8443ff-65af-440d-973b-a009116efdd8',
-                '11e7d3a5-eebd-485b-8fb9-6b0c8cc09d9c',
-                'd9a5ea77-5715-433c-945b-e060c82468f7',
-                '4c71e947-2185-439f-b044-0b9c5fad1ca5',
-                '90b7e07b-dd7b-42ec-b73b-9497077fb0ae',
-                '10d7f9ec-d79a-479a-a397-410c6276b11e',
-                '7dc50b87-84af-462f-8939-69d88417be7b',
-                '170a4c24-1bee-48f6-91cf-dbbe82711c67',
-                'f733b0d5-d516-478d-82da-eacec7dbc8ab',
-                '9dcee953-84ef-415f-80a8-ed8e736cda7d',
-                'fa2c06ef-0e1d-4b5b-9260-e3da50cfafa0',
-                'f692aef2-fd4f-4074-87b2-010b1cff767a',
-                '12de8fc5-d3df-4e43-8824-53b3ea4bd908',
-                '981a1214-15d1-4214-b180-2711f97c66d3',
-                '87424177-05cd-4427-b60e-1a5461bebf22',
-                'abde0e96-4ca2-401e-9095-046a328fffbc',
-                '5f353ef0-289e-449b-a635-e29c6e026e3d',
-                'a0f2a2ae-b5ac-4420-a487-eb03805a6bd2',
-                'a77925c9-6ee6-41bb-b357-b3e5992c11bb',
-                '67e2b251-4878-4c8d-bd19-e9f6780b657c',
-                '82087aa8-8db1-4b05-b3b5-7359ff821e68',
-                '0cb9f260-32af-403c-9f57-1b8adaa3ff3a'
+    for file in ['26429216-48fb-4a7b-ba05-0bb714157477',
+                '6401dc4a-928b-400e-af2b-32f777e1681f',
+                '30c506bc-3a06-442d-a70a-3c99da9c582b',
+                '923bb130-0fad-4f05-b36b-3fe83c7ea422',
+                '95ce9226-dc81-4466-9a36-019f337cb077',
+                '67e592ec-8609-4409-bc00-d9fb337f3521',
+                '77ad55cf-b869-411a-b48e-dae32a11b651',
+                '29e2ad06-08fd-42e7-b2df-1293debd6745',
+                '85558c3e-faab-4878-9999-bb36d3e213fd',
+                'cbab81d3-acf8-48ce-a09f-27abfe5f87bc',
+                'a66d20aa-b53a-4ab6-8d9e-633f6e70ee92',
+                'ccad4413-c860-47f6-bb4a-c17db392d8df',
+                '38720b3c-c0f0-4ec5-9290-40832db23bab',
+                '4a298e96-9f8f-47cb-baef-6bb863464285',
+                'aa754d18-0a95-4aed-8ea1-1de4b9fd03a1',
+                'afafb2a4-f039-40b0-a99c-adb2cd79bf64',
+                'bd115ebb-e5e8-4688-bde0-44bd2b43dbc9',
+                'a49d2d23-b5e5-4f3c-8813-c556a296c1c3',
+                '87de72d1-5662-40df-a84b-e15e33c99ca2',
+                'cb8887cb-440f-4e2e-bc62-b8d987243825',
+                '75a3ed7a-c0ed-4eed-a10a-a5bc46eaf6c5',
+                'd5685cbb-a6e7-4a95-a01d-b513eb6a3e0f',
+                '523c013b-aefe-4600-9bb3-8337229750fc',
+                '77e9e3a4-0ad8-410f-9c7d-614f6b4ee673',
+                '9acde868-e4c3-44bb-b826-86753a919292',
+                '6bffedc2-82c0-4dc0-abe3-7095e74f2083',
+                'e2dfbd08-d19b-4bbc-bb35-6db56f9b936a',
+                'd740e4cc-dc14-48ba-a322-aaafc9e553d6',
+                '436937c3-0fae-4b85-9a40-592858d969fb',
+                '7a6c6ce2-edf1-4ed7-a988-727c1a9836be',
+                '5bbe4e8e-8a60-43dd-8c67-ce184657a57a',
+                'fd9b909f-3186-43f9-9fc4-35fca1fec92e',
+                '22ecca49-4415-4568-84d0-7feca4326db9',
+                '6c7f4fb2-7975-42bc-b20f-c09e7e0137bc',
+                '59d35344-2d4d-469c-b89c-36f60c78b0cf',
+                'b3cd5711-891a-4d6d-9d80-2a5abdae34bf',
+                '6e53886f-a476-4aaa-865e-9ceda734fc20',
+                '9a735a48-e1ad-405d-bea2-22b5f6e0eb84',
+                'cd151ebb-6119-4db3-b388-eae0afd18b43',
+                '9d81c480-439e-4f8c-b9b0-ff3c9a4bbabc',
+                '24028486-f3b6-4177-8538-9024ed2f2ae5',
+                '6b2ade85-74be-40c0-a7c7-0596a517aea7',
+                '775c8794-e5e4-4218-b24a-14fc14140dba',
+                '67900d9a-7a55-4d56-8907-ad43b1ee0e85',
+                '3d4ab038-8949-4aec-b65e-8e0322ae6ce8',
+                'aa016ddc-0407-48bb-98db-41c7eccd559f',
+                '38e5318a-6e7a-4422-89b5-cb842aa03536',
+                '410bc509-c541-4f94-9f7c-4c3cdaf82f3e',
+                '3101f9bc-2f7a-4570-b1fa-afaa5b77328f'
                 ]:
         with open('src/training/bet/models/%s.json' % (file), 'r') as r:
             param = json.load(r)    
@@ -605,17 +635,38 @@ def val_fights():
                           bet_female = param['bet_female']
                           )      
         res = bettor.evaluate(full_score = True, 
-                              fight_list = [#'c3c38c86f5ab9b5c',
-                                             'd4f364dd076bb0e2',
-                                             'fd4578cac86d75ca',
-                                             '805ad1801eb26abb',
-                                             'e69c5ce12f4e762b'],
+                              fight_list = ['c3c38c86f5ab9b5c',
+                                             'ad044be25c94dcfd',
+                                             '41dca66f9dadfc86',
+                                             '3bc27ec15facbcf3',
+                                             'bbb15f301e4a490a',
+                                             '992c82450d96f726'],
                                 save_results = False,
                                 validate = True
                                 )    
         results[file] = res
     with open('src/new_validation_results.json', 'w') as b:
-        json.dump(results, b)    
+        json.dump(results, b)
+
+    with open('src/new_validation_results.json', 'r') as b:
+        results = json.load(b)  
+        
+    df = pd.DataFrame.from_dict(results).T
+    
+    
+    df = df.loc[df['gross'] > 0]
+    
+    top_val_models = {}
+    for idx in df.index:
+        with open('src/training/bet/models/%s.json' % (idx), 'r') as b:
+            mod = json.load(b)      
+        mod['average'] = df.loc[idx]['average']
+        mod['gross'] = df.loc[idx]['gross'] 
+        top_val_models[idx] = mod
+        
+        
+    top_val_models_df = pd.DataFrame.from_dict(top_val_models).T
+    top_val_models_df.to_csv('src/new_validation_results.csv')
 
 
 def validate_new_fights():
@@ -691,7 +742,7 @@ def validate_new_fights():
 #    fight_id = 'dbd198f780286aca'
     
 def add_best_model():
-    best_model_id = 'fa2c06ef-0e1d-4b5b-9260-e3da50cfafa0'
+    best_model_id = '95ce9226-dc81-4466-9a36-019f337cb077'
     with open('src/training/bet/models/%s.json'% (best_model_id)) as f:
         mod = json.load(f)    
     with open('src/predictors/bet/bettor_config.json', 'w') as w:
