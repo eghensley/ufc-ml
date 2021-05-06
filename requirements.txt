@@ -34,7 +34,7 @@ docutils==0.14
 entrypoints==0.2.3
 fake-useragent==0.1.11
 Flask==1.0.2
-Flask-Cors==3.0.8
+Flask-Cors==3.0.9
 gast==0.2.2
 google-pasta==0.1.1
 grpcio==1.18.0
