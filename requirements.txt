@@ -76,7 +76,7 @@ optuna==1.4.0
 packaging==19.0
 pandas==0.24.2
 pandocfilters==1.4.1
-paramiko==2.4.2
+paramiko==2.10.1
 parso==0.2.0
 path.py==11.0.1
 pbr==5.1.2
