@@ -49,7 +49,7 @@ itsdangerous==1.1.0
 jedi==0.12.0
 jeepney==0.4
 Jinja2==2.10
-joblib==0.13.2
+joblib==1.2.0
 jsonschema==2.6.0
 keyring==17.1.1
 kiwisolver==1.0.1
